@@ -7,17 +7,26 @@
 lm_summary(x, y)
 }
 \arguments{
-\item{x}{A numeric vector of independent variable values.}
+\item{x}{A numeric vector of independent variable values (numeric).}
 
-\item{y}{A numeric vector of dependent variable values.}
+\item{y}{A numeric vector of dependent variable values (numeric).}
 }
 \value{
-The summary of the linear model.
+A summary of the linear model, which includes:
+\itemize{
+\item Coefficients: Estimates of the model parameters (intercept and slope).
+\item Residuals: Summary statistics of the residuals.
+\item Statistical significance: p-values for the coefficients.
+\item R-squared value: Proportion of variance explained by the model.
+}
 }
 \description{
-This function takes two data vectors x and y and fits a linear model (lm) to them. It then returns the summary of the model.
+This function takes two data vectors x and y and fits a linear model to them.
+The linear model is of the form:
+y = beta_0 + beta_1 * x + epsilon
+where beta_0 is the intercept, beta_1 is the slope, and epsilon is the error term.
 }
 \examples{
-lm_summary(c(1, 2, 3, 4), c(2, 4, 6, 8))
+lm_summary(c(1, 2, 3, 4), c(2, 4, 6, 8))  # Linear relationship should yield a slope of 2
 
 }

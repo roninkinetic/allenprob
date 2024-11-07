@@ -7,20 +7,37 @@
 prob_between(lower_bound, upper_bound, mean, sd)
 }
 \arguments{
-\item{lower_bound}{The lower bound.}
+\item{lower_bound}{The lower bound (numeric).}
 
-\item{upper_bound}{The upper bound.}
+\item{upper_bound}{The upper bound (numeric).}
 
-\item{mean}{The mean of the distribution.}
+\item{mean}{The mean of the distribution (numeric).}
 
-\item{sd}{The standard deviation of the distribution.}
+\item{sd}{The standard deviation of the distribution (numeric).}
 }
 \value{
-The probability of the variable being between lower_bound and upper_bound.
+The probability of the variable being between \code{lower_bound} and \code{upper_bound} as a numeric value.
 }
 \description{
-Calculates the probability of a normally distributed variable being between two specified bounds.
+This function calculates the probability of a normally distributed variable falling
+between two specified bounds. It uses the properties of the normal distribution to compute
+this probability.
+}
+\details{
+The calculation involves the following steps:
+\enumerate{
+\item Compute the cumulative distribution function (CDF) at the upper bound:
+P(X <= b) = pnorm(b, mean, sd)
+This gives the probability that the variable is less than or equal to the upper bound b.
+\item Compute the CDF at the lower bound:
+P(X <= a) = pnorm(a, mean, sd)
+This gives the probability that the variable is less than or equal to the lower bound a.
+\item The probability of the variable being between the lower and upper bounds is given by:
+P(a < X <= b) = P(X <= b) - P(X <= a)
+This represents the difference between the two cumulative probabilities.
+}
 }
 \examples{
 prob_between(10, 20, 15, 5)
+
 }

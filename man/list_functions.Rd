@@ -2,17 +2,23 @@
 % Please edit documentation in R/functions.R
 \name{list_functions}
 \alias{list_functions}
-\title{list_functions: List all available functions in the package}
+\title{list_functions: List all available functions in the specified package}
 \usage{
-list_functions()
+list_functions(package_name = "allenprob")
+}
+\arguments{
+\item{package_name}{A string representing the name of the package to list functions from (default is "allenprob").}
 }
 \value{
-A character vector of function names.
+A character vector of function names available in the specified package.
 }
 \description{
-This function lists all the available functions in the 'statHelper' package.
+This function lists all the available functions in the specified R package.
+By default, it lists the functions in the 'allenprob' package, but you can
+modify it to specify any package you want to inspect.
 }
 \examples{
-list_functions()
+list_functions()  # Lists functions in the 'allenprob' package
+list_functions("stats")  # Lists functions in the 'stats' package
 
 }

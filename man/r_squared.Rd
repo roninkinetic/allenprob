@@ -2,20 +2,28 @@
 % Please edit documentation in R/functions.R
 \name{r_squared}
 \alias{r_squared}
-\title{r_squared: Calculate the coefficient of determination (R^2) given the correlation coefficient (r)}
+\title{r_squared: Calculate the coefficient of determination (R^2) from the correlation coefficient (r)}
 \usage{
 r_squared(r)
 }
 \arguments{
-\item{r}{Correlation coefficient.}
+\item{r}{Correlation coefficient (numeric). Should be between -1 and 1.}
 }
 \value{
-The coefficient of determination (R^2).
+The coefficient of determination (R^2) (numeric). A value between 0 and 1,
+indicating the proportion of variance explained.
 }
 \description{
-This function calculates the coefficient of determination (R^2) from the correlation coefficient (r).
+This function calculates the coefficient of determination (R^2) from the given
+correlation coefficient (r). The coefficient of determination indicates the
+proportion of the variance in the dependent variable that is predictable
+from the independent variable.
+}
+\details{
+The calculation is based on the formula:
+R^2 = r^2
 }
 \examples{
-r_squared(0.8)
+r_squared(0.8)  # Returns 0.64
 
 }

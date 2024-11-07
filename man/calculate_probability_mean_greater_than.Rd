@@ -12,20 +12,39 @@ calculate_probability_mean_greater_than(
 )
 }
 \arguments{
-\item{population_mean}{The mean of the population.}
+\item{population_mean}{The mean of the population (numeric).}
 
-\item{population_sd}{The standard deviation of the population.}
+\item{population_sd}{The standard deviation of the population (numeric).}
 
-\item{sample_size}{The size of the sample.}
+\item{sample_size}{The size of the sample (integer).}
 
-\item{sample_mean}{The target sample mean.}
+\item{sample_mean}{The target sample mean (numeric).}
 }
 \value{
-The probability as a numeric value.
+The probability as a numeric value representing the likelihood of the sample mean
+being greater than or equal to the target.
 }
 \description{
-Calculates the probability of the sample mean being greater than or equal to a target value.
+This function calculates the probability of the sample mean being greater than or equal
+to a specified target value based on the population mean, population standard deviation,
+and sample size. This is useful for hypothesis testing and assessing how likely it is
+to observe a sample mean at or above a certain threshold under the null hypothesis.
+}
+\details{
+The calculation involves the following steps:
+\enumerate{
+\item Calculate the standard error (SE) of the sample mean using the formula:
+SE = sigma / sqrt(n)
+where sigma is the population standard deviation and n is the sample size.
+\item Compute the z-score for the target sample mean using the formula:
+z = (x_bar - mu) / SE
+where x_bar is the target sample mean and mu is the population mean.
+\item Calculate the probability of obtaining a sample mean greater than or equal to the target
+value using the complementary cumulative distribution function:
+P(X >= x_bar) = 1 - P(Z <= z) = 1 - pnorm(z)
+}
 }
 \examples{
 calculate_probability_mean_greater_than(100, 15, 30, 105)
+
 }

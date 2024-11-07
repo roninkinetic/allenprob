@@ -7,18 +7,33 @@
 calculate_probability_cost_greater_than(mean_cost, sd_cost, threshold_cost)
 }
 \arguments{
-\item{mean_cost}{The mean cost of the distribution.}
+\item{mean_cost}{The mean cost of the distribution (numeric).}
 
-\item{sd_cost}{The standard deviation of the cost.}
+\item{sd_cost}{The standard deviation of the cost (numeric).}
 
-\item{threshold_cost}{The cost threshold to compare against.}
+\item{threshold_cost}{The cost threshold to compare against (numeric).}
 }
 \value{
-The probability of the cost being greater than the threshold.
+The probability of the cost being greater than the threshold (numeric).
 }
 \description{
-Calculates the probability that a cost is greater than a specified threshold, based on the mean and standard deviation of the cost.
+This function calculates the probability that a cost is greater than a specified threshold,
+based on the mean and standard deviation of the cost distribution. This is useful for
+understanding the likelihood of costs exceeding a certain level in a normally distributed
+context.
+}
+\details{
+The calculation involves the following steps:
+\enumerate{
+\item Calculate the z-score corresponding to the threshold cost using the formula:
+z = (X - mu) / sigma
+where X is the threshold cost, mu is the mean cost, and sigma is the standard deviation of the cost.
+\item Use the complementary cumulative distribution function (CDF) of the standard normal distribution
+to find the probability that a cost is greater than the threshold:
+P(X > threshold_cost) = 1 - P(Z <= z) = 1 - pnorm(z)
+}
 }
 \examples{
 calculate_probability_cost_greater_than(100, 15, 110)
+
 }

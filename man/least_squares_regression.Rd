@@ -2,32 +2,44 @@
 % Please edit documentation in R/functions.R
 \name{least_squares_regression}
 \alias{least_squares_regression}
-\title{least_squares_regression: Perform least squares regression given ybar, xbar, s_x, s_y, and R}
+\title{least_squares_regression: Perform least squares regression using means, standard deviations, and correlation}
 \usage{
 least_squares_regression(ybar, xbar, s_x, s_y, R)
 }
 \arguments{
-\item{ybar}{Mean of y values.}
+\item{ybar}{Mean of y values (numeric).}
 
-\item{xbar}{Mean of x values.}
+\item{xbar}{Mean of x values (numeric).}
 
-\item{s_x}{Standard deviation of x values.}
+\item{s_x}{Standard deviation of x values (numeric).}
 
-\item{s_y}{Standard deviation of y values.}
+\item{s_y}{Standard deviation of y values (numeric).}
 
-\item{R}{Correlation coefficient between x and y.}
+\item{R}{Correlation coefficient between x and y (numeric, should be between -1 and 1).}
 }
 \value{
-A list containing the slope and intercept of the regression line.
+A list containing:
+\itemize{
+\item \code{slope}: The slope of the regression line (numeric).
+\item \code{intercept}: The intercept of the regression line (numeric).
+}
 }
 \description{
-This function calculates the least squares regression line using the mean of y (ybar),
-the mean of x (xbar), the standard deviations of x (s_x), and y (s_y), and the correlation coefficient (R).
+This function calculates the least squares regression line using the means of the dependent variable
+(ybar) and the independent variable (xbar), the standard deviations of x (s_x) and y (s_y),
+and the correlation coefficient (R) between the two variables.
 }
 \details{
-The regression line is of the form: y = intercept + slope * x
+The regression line is expressed in the form:
+y = intercept + slope * x
+
+The slope is calculated using the formula:
+slope = R * (s_y / s_x)
+
+The intercept is calculated as:
+intercept = ybar - slope * xbar
 }
 \examples{
-least_squares_regression(5, 3, 1.2, 2.1, 0.8)
+least_squares_regression(5, 3, 1.2, 2.1, 0.8)  # Example calculation
 
 }

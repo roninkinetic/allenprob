@@ -18,11 +18,29 @@ sample_proportion_prob(
 \item{sample_proportion_target}{The target sample proportion.}
 }
 \value{
-The probability as a numeric value.
+The probability as a numeric value representing the cumulative probability of the
+sample proportion being less than or equal to the target.
 }
 \description{
-Calculates the probability for sample proportions based on a specified population proportion, sample size, and target sample proportion.
+This function calculates the probability of observing a sample proportion
+greater than or equal to a specified target sample proportion based on
+a given population proportion and sample size.
+}
+\details{
+The calculation is based on the standard normal distribution, and the
+steps involved are as follows:
+\enumerate{
+\item Calculate the standard error of the sample proportion using the formula:
+SE = sqrt((p * (1 - p)) / n)
+where p is the population proportion and n is the sample size.
+\item Compute the z-score using the formula:
+z = (p_hat - p) / SE
+where p_hat is the target sample proportion.
+\item Use the z-score to calculate the cumulative probability using the standard normal distribution:
+P(Z <= z) = pnorm(z)
+}
 }
 \examples{
 sample_proportion_prob(0.5, 100, 0.55)
+
 }

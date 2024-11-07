@@ -7,19 +7,24 @@
 cor3var(s_x, s_y, slope)
 }
 \arguments{
-\item{s_x}{Standard deviation of x.}
+\item{s_x}{Standard deviation of x (numeric).}
 
-\item{s_y}{Standard deviation of y.}
+\item{s_y}{Standard deviation of y (numeric).}
 
-\item{slope}{The slope of the regression line.}
+\item{slope}{The slope of the regression line (numeric).}
 }
 \value{
-The correlation coefficient (r).
+The correlation coefficient (r) (numeric).
 }
 \description{
 This function calculates the correlation coefficient (r) using the standard
-deviation of x (s_x), the standard deviation of y (s_y), and the slope of the
-regression line.
+deviation of x (\( s_x \)), the standard deviation of y (\( s_y \)), and the slope of the
+regression line. The correlation coefficient indicates the strength and direction
+of the linear relationship between two variables.
+}
+\details{
+The calculation is based on the following formula:
+r = (slope * s_x) / s_y
 }
 \examples{
 cor3var(1.5, 2.5, 0.8)

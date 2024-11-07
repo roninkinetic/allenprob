@@ -7,18 +7,33 @@
 sample_mean_variance(X, P_X)
 }
 \arguments{
-\item{X}{A numeric vector of values.}
+\item{X}{A numeric vector of values (numeric).}
 
-\item{P_X}{A numeric vector of probabilities associated with X.}
+\item{P_X}{A numeric vector of probabilities associated with X (numeric).
+Length of P_X must be equal to length of X, and the probabilities should sum to 1.}
 }
 \value{
-A list containing the mean and variance of the sample distribution.
+A list containing:
+\itemize{
+\item \code{mean}: The mean of the sample distribution (numeric).
+\item \code{variance}: The variance of the sample distribution (numeric).
+}
 }
 \description{
-This function takes two vectors, X (values) and P(X) (probabilities), and calculates
-the mean and variance of the sample distribution.
+This function calculates the mean and variance of a sample distribution given two vectors:
+a vector of values (X) and a vector of probabilities (P(X)) associated with those values.
+The function assumes that the probabilities are normalized (i.e., they sum to 1).
+}
+\details{
+The calculations are performed as follows:
+\enumerate{
+\item The mean is calculated using the formula:
+mean = sum(X * P(X))
+\item The variance is calculated using the formula:
+variance = sum((X - mean)^2 * P(X))
+}
 }
 \examples{
-sample_mean_variance(c(1, 2, 3), c(0.2, 0.5, 0.3))
+sample_mean_variance(c(1, 2, 3), c(0.2, 0.5, 0.3))  # Example calculation
 
 }

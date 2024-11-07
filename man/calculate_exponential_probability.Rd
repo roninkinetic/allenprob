@@ -7,18 +7,35 @@
 calculate_exponential_probability(lambda, time_start, time_end)
 }
 \arguments{
-\item{lambda}{The rate parameter of the exponential distribution.}
+\item{lambda}{The rate parameter of the exponential distribution (numeric).}
 
-\item{time_start}{The start time.}
+\item{time_start}{The start time (numeric).}
 
-\item{time_end}{The end time.}
+\item{time_end}{The end time (numeric).}
 }
 \value{
-The probability of the event occurring between time_start and time_end.
+The probability of the event occurring between \code{time_start} and \code{time_end} as a numeric value.
 }
 \description{
-Calculates the probability of an event occurring between two times for an exponential distribution with a specified rate.
+This function calculates the probability of an event occurring between two specified times
+in an exponential distribution characterized by a rate parameter. The exponential
+distribution is commonly used to model the time until an event occurs.
+}
+\details{
+The calculation involves the following steps:
+\enumerate{
+\item Compute the cumulative distribution function (CDF) at the end time using:
+P(X <= t) = pexp(t, rate = lambda)
+This gives the probability that the event occurs by time t.
+\item Compute the CDF at the start time using:
+P(X <= t0) = pexp(t0, rate = lambda)
+This gives the probability that the event occurs by time t0.
+\item The probability of the event occurring between the start and end times is given by:
+P(t0 < X <= t) = P(X <= t) - P(X <= t0)
+This represents the difference between the two cumulative probabilities.
+}
 }
 \examples{
 calculate_exponential_probability(0.1, 2, 5)
+
 }

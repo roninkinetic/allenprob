@@ -12,20 +12,39 @@ calculate_sample_mean_probability(
 )
 }
 \arguments{
-\item{population_mean}{The mean of the population.}
+\item{population_mean}{The mean of the population (numeric).}
 
-\item{population_std_dev}{The standard deviation of the population.}
+\item{population_std_dev}{The standard deviation of the population (numeric).}
 
-\item{sample_size}{The size of the sample.}
+\item{sample_size}{The size of the sample (integer).}
 
-\item{sample_mean_target}{The target sample mean.}
+\item{sample_mean_target}{The target sample mean (numeric).}
 }
 \value{
-The probability as a numeric value.
+The probability as a numeric value representing the likelihood of obtaining a sample
+mean at least as extreme as the target.
 }
 \description{
-Calculates the probability of obtaining a sample mean at least as extreme as a target value given a population mean, standard deviation, and sample size.
+This function calculates the probability of obtaining a sample mean that is at least
+as extreme as a specified target value, given a population mean, population standard
+deviation, and sample size. This is useful for hypothesis testing and determining
+how likely a sample mean is under the null hypothesis.
+}
+\details{
+The calculation involves the following steps:
+\enumerate{
+\item Calculate the standard error (SE) of the sample mean using the formula:
+SE = sigma / sqrt(n)
+where sigma is the population standard deviation and n is the sample size.
+\item Compute the z-score for the target sample mean using the formula:
+z = (x_bar - mu) / SE
+where x_bar is the target sample mean and mu is the population mean.
+\item Calculate the probability of obtaining a sample mean at least as extreme as the target
+value using the cumulative distribution function of the standard normal distribution:
+P(X >= x_bar) = 1 - P(Z <= z) = 1 - pnorm(z)
+}
 }
 \examples{
 calculate_sample_mean_probability(100, 15, 30, 105)
+
 }

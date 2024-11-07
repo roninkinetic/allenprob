@@ -12,20 +12,46 @@ calculate_confidence_interval(
 )
 }
 \arguments{
-\item{sample_mean}{The mean of the sample.}
+\item{sample_mean}{The mean of the sample (numeric).}
 
-\item{sample_sd}{The standard deviation of the sample.}
+\item{sample_sd}{The standard deviation of the sample (numeric).}
 
-\item{sample_size}{The size of the sample.}
+\item{sample_size}{The size of the sample (integer).}
 
-\item{confidence_level}{The confidence level (e.g., 0.95 for 95\% confidence).}
+\item{confidence_level}{The confidence level (numeric, e.g., 0.95 for 95\% confidence).}
 }
 \value{
-A list with the lower and upper bounds of the confidence interval.
+A list containing the lower and upper bounds of the confidence interval:
+\itemize{
+\item \code{lower_bound}: The lower bound of the confidence interval.
+\item \code{upper_bound}: The upper bound of the confidence interval.
+}
 }
 \description{
-Calculates the confidence interval for a sample mean based on sample mean, sample standard deviation, sample size, and confidence level.
+This function calculates the confidence interval for a sample mean based on the sample mean,
+sample standard deviation, sample size, and desired confidence level. The confidence interval
+provides a range of values within which the true population mean is expected to lie with a
+specified level of confidence.
+}
+\details{
+The calculation involves the following steps:
+\enumerate{
+\item Calculate the significance level (alpha) from the confidence level:
+alpha = 1 - confidence_level
+\item Determine the critical z-value for the specified confidence level:
+z = qnorm(1 - (alpha / 2)
+This critical value corresponds to the desired level of confidence and accounts for the
+tails of the normal distribution.
+\item Calculate the standard error (SE) of the sample mean using the formula:
+SE = s / sqrt(n)
+where s is the sample standard deviation and n is the sample size.
+\item Calculate the margin of error using the formula:
+ME = z * SE
+\item The confidence interval is then given by:
+CI = (sample_mean - ME, sample_mean + ME)
+}
 }
 \examples{
 calculate_confidence_interval(50, 10, 30, 0.95)
+
 }

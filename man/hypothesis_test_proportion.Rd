@@ -7,18 +7,56 @@
 hypothesis_test_proportion(successes, trials, significance_level)
 }
 \arguments{
-\item{successes}{The number of successes in the sample.}
+\item{successes}{The number of successes in the sample (integer).}
 
-\item{trials}{The number of trials in the sample (sample size).}
+\item{trials}{The number of trials in the sample (sample size, integer).}
 
-\item{significance_level}{The significance level for the hypothesis test (e.g., 0.05 for a 5\% significance level).}
+\item{significance_level}{The significance level for the hypothesis test (numeric, e.g., 0.05 for a 5\% significance level).}
 }
 \value{
-A list containing the z-test statistic, p-value, and the decision result ("Reject the null hypothesis" or "Fail to reject the null hypothesis").
+A list containing:
+\itemize{
+\item \code{z}: The z-test statistic (numeric).
+\item \code{p_value}: The calculated p-value (numeric).
+\item \code{result}: A string indicating whether to "Reject the null hypothesis" or "Fail to reject the null hypothesis."
+}
 }
 \description{
-Performs a two-tailed hypothesis test for a proportion to determine if the sample proportion significantly differs from the null hypothesis proportion (default is 0.5).
+This function performs a two-tailed hypothesis test for a proportion to determine
+if the sample proportion significantly differs from the null hypothesis proportion.
+The default null hypothesis proportion is set to 0.5.
+}
+\details{
+The calculation involves the following steps:
+
+Perform a Two-Tailed Hypothesis Test for a Proportion
+
+This function performs a two-tailed hypothesis test for a proportion to determine
+if the sample proportion significantly differs from the null hypothesis proportion.
+The default null hypothesis proportion is set to 0.5.
+
+The calculation involves the following steps:
+\enumerate{
+\item Calculate the sample proportion (p_hat):
+p_hat = successes / trials
+\item Set the null hypothesis proportion (p_0):
+p_0 = 0.5
+\item Calculate the standard error (SE) for the null hypothesis proportion using:
+SE = sqrt((p_0 * (1 - p_0)) / trials)
+\item Compute the z-test statistic:
+z = (p_hat - p_0) / SE
+\item Calculate the p-value for the two-tailed test:
+p-value = 2 * (1 - P(Z <= |z|)) = 2 * (1 - pnorm(|z|))
+\item Determine the critical z-value for the specified significance level:
+z_critical = qnorm(1 - (alpha / 2))
+\item Make a decision based on the comparison of the absolute z-test statistic with the critical z-value:
+\itemize{
+\item If |z| > z_critical, reject the null hypothesis.
+\item Otherwise, fail to reject the null hypothesis.
+}
+}
 }
 \examples{
 hypothesis_test_proportion(55, 100, 0.05)
+
 }

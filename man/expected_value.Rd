@@ -7,22 +7,27 @@
 expected_value(win_amount, lose_amount, prob_win, prob_loss)
 }
 \arguments{
-\item{win_amount}{The amount won if the event is successful.}
+\item{win_amount}{The amount won if the event is successful (numeric).}
 
-\item{lose_amount}{The amount lost if the event is unsuccessful.}
+\item{lose_amount}{The amount lost if the event is unsuccessful (numeric).}
 
-\item{prob_win}{Probability of winning the event.}
+\item{prob_win}{The probability of winning the event (numeric, should be between 0 and 1).}
 
-\item{prob_loss}{Probability of losing the event.}
+\item{prob_loss}{The probability of losing the event (numeric, should be between 0 and 1).}
 }
 \value{
-The expected value of the event.
+The expected value of the event (numeric).
 }
 \description{
-This function calculates the expected value of an event given the win amount, lose amount,
-probability of win, and probability of loss.
+This function calculates the expected value of an event based on the win amount,
+lose amount, probability of winning, and probability of losing. The expected value
+provides a measure of the average outcome of a probabilistic event.
+}
+\details{
+The expected value is calculated using the formula:
+expected_value = (win_amount * prob_win) + (lose_amount * prob_loss)
 }
 \examples{
-expected_value(100, -50, 0.6, 0.4)
+expected_value(100, -50, 0.6, 0.4)  # Expected value calculation
 
 }

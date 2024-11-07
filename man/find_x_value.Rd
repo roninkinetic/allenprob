@@ -7,18 +7,34 @@
 find_x_value(mean, sd, probability)
 }
 \arguments{
-\item{mean}{The mean of the distribution.}
+\item{mean}{The mean of the distribution (numeric).}
 
-\item{sd}{The standard deviation of the distribution.}
+\item{sd}{The standard deviation of the distribution (numeric).}
 
-\item{probability}{The target probability.}
+\item{probability}{The target probability (numeric, must be between 0 and 1).}
 }
 \value{
-The \code{x} value corresponding to the specified probability.
+The \code{x} value corresponding to the specified probability (numeric).
 }
 \description{
-Finds the value of \code{x} such that the probability of a normally distributed random variable being greater than \code{x} is equal to the specified probability.
+This function finds the value of \code{x} such that the probability of a normally
+distributed random variable being greater than \code{x} is equal to the specified
+probability. This is useful for determining threshold values in statistical analyses.
+}
+\details{
+The calculation involves the following steps:
+\enumerate{
+\item Compute the z-score corresponding to the specified probability using the quantile function
+for the standard normal distribution:
+z = qnorm(1 - probability)
+This gives the z-value such that the area to the right of z in the standard normal
+distribution equals the specified probability.
+\item Convert the z-score to the corresponding x value using the formula:
+x = mu + z * sigma
+where mu is the mean and sigma is the standard deviation of the distribution.
+}
 }
 \examples{
 find_x_value(100, 15, 0.05)
+
 }
