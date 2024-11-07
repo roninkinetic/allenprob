@@ -290,8 +290,8 @@ cor3var <- function(s_x, s_y, slope) {
 #'
 #' @export
 list_functions <- function() {
-  # List all functions available in the statHelper package
-  return(lsf.str("package:statHelper"))
+  # List all functions available in the allenprob package
+  return(lsf.str("package:allenprob"))
 }
 
 #' r_squared: Calculate the coefficient of determination (R^2) given the correlation coefficient (r)
