@@ -1,3 +1,4 @@
+utils::globalVariables(c("x"))
 #' Calculate Probability for Sample Proportions
 #'
 #' This function calculates the probability of observing a sample proportion
@@ -942,7 +943,7 @@ calculate_sample_size_for_proportion <- function(proportion, confidence_level, m
 #' Perform a Hypothesis Test for a Fair Coin Flip
 #'
 #' This function tests the claim that a coin is fair (p = 0.5) against the alternative
-#' that it is not fair (p ≠ 0.5) using a two-tailed hypothesis test. The function
+#' that it is not fair (p <> 0.5) using a two-tailed hypothesis test. The function
 #' calculates the z statistic for the observed number of heads in a series of coin flips,
 #' and compares it against the critical value derived from the specified significance level.
 #'
@@ -951,7 +952,7 @@ calculate_sample_size_for_proportion <- function(proportion, confidence_level, m
 #'
 #' @param heads An integer representing the number of heads observed in the coin flips (integer).
 #' @param total_flips An integer representing the total number of coin flips (integer).
-#' @param alpha A numeric value representing the significance level (default is 0.01, should be between 0 and 1).
+#' @param alpha A numeric value representing the significance level (default is 0.01).
 #'
 #' @return A list containing:
 #'   - `z_value`: The calculated z statistic (numeric).
@@ -959,7 +960,7 @@ calculate_sample_size_for_proportion <- function(proportion, confidence_level, m
 #'   - `decision`: A string indicating whether to "Reject H0" or "Fail to Reject H0".
 #'
 #' @examples
-#' coin_test_result <- coin_hypothesis_test(heads = 44, total_flips = 100)
+#' coin_test_result <- coin_hypothesis_test(heads = 56, total_flips = 100)
 #' print(coin_test_result)
 #'
 #' @export
@@ -1025,4 +1026,1295 @@ hypothesis_conclusion <- function(p_value) {
   }
 
   return(conclusion)
+}
+
+
+#' Calculate Probability of Costs Between Two Values
+#'
+#' This function calculates the probability that a cost, following a normal distribution, falls between two specified values.
+#'
+#' The costs are assumed to follow a normal distribution with a specified mean and standard deviation.
+#'
+#' @param lower_bound The lower bound of the cost range (numeric).
+#' @param upper_bound The upper bound of the cost range (numeric).
+#' @param mean The mean of the normal distribution (numeric).
+#' @param sd The standard deviation of the normal distribution (numeric).
+#' @return The probability that a cost falls between the lower and upper bounds (numeric).
+#' @examples
+#' probability_between_costs(41, 107, 74, 22)
+#' @export
+probability_between_costs <- function(lower_bound, upper_bound, mean, sd) {
+  # Calculate the cumulative probabilities at the lower and upper bounds
+  prob_lower <- pnorm(lower_bound, mean = mean, sd = sd)
+  prob_upper <- pnorm(upper_bound, mean = mean, sd = sd)
+
+  # Calculate the probability that the cost is between the two bounds
+  probability <- prob_upper - prob_lower
+
+  return(probability)
+}
+
+#' Calculate Mean and Standard Deviation of the Sampling Distribution of Proportions
+#'
+#' This function calculates the mean and standard deviation of the sampling distribution
+#' for a given population proportion and sample size.
+#'
+#' The mean of the sampling distribution is equal to the population proportion, and the
+#' standard deviation (standard error) is calculated based on the population proportion
+#' and the sample size.
+#'
+#' @param population_proportion The proportion of the population with the characteristic of interest (numeric).
+#' @param sample_size The size of the sample (integer).
+#' @return A list containing the mean and standard deviation of the sampling distribution.
+#' @examples
+#' sampling_distribution_parameters(0.74, 100)
+#' @export
+sampling_distribution_parameters <- function(population_proportion, sample_size) {
+  # Calculate the mean of the sampling distribution
+  mean_sampling_distribution <- population_proportion
+
+  # Calculate the standard deviation (standard error) of the sampling distribution
+  standard_deviation_sampling_distribution <- sqrt((population_proportion * (1 - population_proportion)) / sample_size)
+
+  # Return the results as a list
+  return(list(mean = mean_sampling_distribution, standard_deviation = standard_deviation_sampling_distribution))
+}
+
+#' Solve Uniform Distribution Problems
+#'
+#' This function solves problems related to a uniform distribution, where the density curve is defined
+#' between a lower bound (x = 1) and an upper bound (x = 8). It calculates the height of the uniform distribution curve,
+#' the density function value at a given point, the percentage of observations in a specified range,
+#' and the probability of specific values (including below, above, and equal).
+#'
+#' @param x A numeric value or a vector of numeric values specifying the bounds for the calculations.
+#' @param lower_bound The lower bound of the uniform distribution (default is 1).
+#' @param upper_bound The upper bound of the uniform distribution (default is 8).
+#'
+#' @return A list containing:
+#'   - `height`: The height of the uniform distribution curve.
+#'   - `density_function`: The value of the uniform density function at `x`.
+#'   - `percent_in_range`: The percent of observations falling within the specified range.
+#'   - `percent_below`: The percent of observations below the specified value.
+#'   - `percent_above`: The percent of observations above the specified value.
+#'   - `percent_equal`: The percent of observations equal to a specified value (always 0 for continuous distributions).
+#'
+#' @examples
+#' uniform_distribution(2, 1, 8)
+#' uniform_distribution(c(2, 5), 1, 8)  # Percent between 2 and 5
+#' uniform_distribution(4, 1, 8)  # Percent below 4
+#' uniform_distribution(6, 1, 8)  # Percent above 6
+#' uniform_distribution(7, 1, 8)  # Percent equal to 7 (always 0)
+#'
+#' @export
+uniform_distribution <- function(x, lower_bound, upper_bound) {
+  # Calculate the height of the uniform distribution curve
+  height <- 1 / (upper_bound - lower_bound)
+
+  # Calculate density function value at x
+  density_function <- ifelse(x >= lower_bound & x <= upper_bound, height, 0)
+
+  # Calculate percent between two points if two values are provided
+  if (length(x) == 2) {
+    percent_in_range <- (x[2] - x[1]) * height * 100
+  } else {
+    percent_in_range <- NA
+  }
+
+  # Calculate percent below x
+  if (!is.null(x)) {
+    percent_below <- (x - lower_bound) * height * 100
+  }
+
+  # Calculate percent above x
+  percent_above <- (upper_bound - x) * height * 100
+
+  # Percent equal to x (always 0 for continuous distributions)
+  percent_equal <- 0
+
+  return(list(height = height,
+              density_function = density_function,
+              percent_in_range = percent_in_range,
+              percent_below = percent_below,
+              percent_above = percent_above,
+              percent_equal = percent_equal))
+}
+
+#' Calculate Probability Between Two Values for a Uniform Distribution
+#'
+#' This function calculates the probability (percent) that an observation falls between two given values
+#' within the range of a uniform distribution defined between a lower and upper bound.
+#'
+#' @param lower_bound The lower bound of the uniform distribution (default is 1).
+#' @param upper_bound The upper bound of the uniform distribution (default is 8).
+#' @param x1 The first value in the range.
+#' @param x2 The second value in the range.
+#'
+#' @return The percentage of observations falling between `x1` and `x2`.
+#'
+#' @examples
+#' uniform_probability_between(1, 8, 2, 5)  # Probability between 2 and 5
+#' @export
+uniform_probability_between <- function(lower_bound, upper_bound, x1, x2) {
+  # Calculate the height of the uniform distribution curve
+  height <- 1 / (upper_bound - lower_bound)
+
+  # Calculate the probability (percent) between x1 and x2
+  percent_in_range <- (x2 - x1) * height * 100
+
+  return(percent_in_range)
+}
+
+#' Compute CDF, Probabilities, and Expectations for the Breakage Point Distribution
+#'
+#' This function calculates the cumulative distribution function (CDF), probabilities,
+#' expectations, and variances for the distribution of the breakage point in a 12-inch bar.
+#' The breakage point, denoted as Y, has a probability density function (PDF) defined by the user.
+#'
+#' The function can compute the following:
+#' - The CDF of Y.
+#' - Specific probabilities such as P(Y <equalsto x1), P(Y > x2), and P(x1 <equalsto Y <equalsto x2).
+#' - The expected value E(Y), the second moment E(Y^2), and the variance Var(Y).
+#' - The probability that the break occurs more than a specified distance from the expected break point.
+#' - The expected length of the shorter segment when the break occurs.
+#'
+#' @param pdf_function A function that calculates the PDF of Y.
+#' @param a Lower bound for the probability calculations (default is 0).
+#' @param b Upper bound for the probability calculations (default is 12, for the length of the bar).
+#' @param expected_break The expected break point (default is the mean of the distribution).
+#' @param x1 First threshold for probability calculations (default is 4).
+#' @param x2 Second threshold for probability calculations (default is 6).
+#' @param distance_from_expected The distance from the expected break point for probability calculation (default is 2).
+#' @return A list containing:
+#'   - `cdf` The cumulative distribution function.
+#'   - `probabilities` A list of probabilities for specific ranges.
+#'   - `expectations` A list containing the expected value, second moment, and variance.
+#'   - `shorter_segment_expectation` The expected length of the shorter segment when the break occurs.
+#' @importFrom stats integrate
+#'
+#' @examples
+#' # Define a simple PDF function for a uniform distribution over the range [0, 12]
+#' pdf_function <- function(y) { ifelse(y >= 0 & y <= 12, 1 / 12, 0) }
+#' breakage_analysis(pdf_function, x1 = 4, x2 = 6, distance_from_expected = 2)
+#'
+#' @export
+breakage_analysis <- function(pdf_function, a = 0, b = 12, expected_break = 6, x1 = 4, x2 = 6, distance_from_expected = 2) {
+  # Function to calculate the CDF from the given PDF
+  cdf_function <- function(y) {
+    integrate(pdf_function, a, y)$value
+  }
+
+  # Compute the CDF of Y
+  cdf_values <- sapply(seq(a, b, length.out = 100), cdf_function)
+
+  # Calculate probabilities
+  P_Y_less_than_x1 <- cdf_function(x1)
+  P_Y_greater_than_x2 <- 1 - cdf_function(x2)
+  P_Y_between_x1_and_x2 <- cdf_function(x2) - cdf_function(x1)
+
+  probabilities <- list(P_Y_less_than_x1 = P_Y_less_than_x1,
+                        P_Y_greater_than_x2 = P_Y_greater_than_x2,
+                        P_Y_between_x1_and_x2 = P_Y_between_x1_and_x2)
+
+  # Compute Expectations and Variance
+  E_Y <- integrate(function(y) y * pdf_function(y), a, b)$value
+  E_Y2 <- integrate(function(y) y^2 * pdf_function(y), a, b)$value
+  variance_Y <- E_Y2 - E_Y^2
+
+  expectations <- list(E_Y = E_Y,
+                       E_Y2 = E_Y2,
+                       Var_Y = variance_Y)
+
+  # Probability that the break occurs more than `distance_from_expected` from expected break point
+  P_more_than_distance_from_expected <- 1 - cdf_function(expected_break + distance_from_expected) + cdf_function(expected_break - distance_from_expected)
+
+  # Expected length of the shorter segment
+  shorter_segment_expectation <- expected_break / 2  # Assuming uniform break distribution
+
+  return(list(cdf = cdf_values,
+              probabilities = probabilities,
+              expectations = expectations,
+              shorter_segment_expectation = shorter_segment_expectation))
+}
+
+
+#' Compute Parameters and Probability for Gamma Distribution with Mean and Variance
+#'
+#' This function calculates the parameters (alpha and beta) of the gamma distribution
+#' based on the provided mean and variance. It also computes the probability that the
+#' daily power consumption exceeds a specified threshold (12 million kilowatt-hours).
+#'
+#' The gamma distribution has the following characteristics:
+#' - The mean is equal to the product of alpha and beta.
+#' - The variance is equal to alpha times the square of beta.
+#'
+#' The function solves for the values of alpha (shape parameter) and beta (scale parameter),
+#' and then calculates the probability that the power consumption exceeds the threshold using the cumulative
+#' distribution function (CDF) of the gamma distribution.
+#'
+#' @param mu The mean of the distribution (in millions of kilowatt-hours).
+#' @param sigma2 The variance of the distribution (in millions of kilowatt-hours squared).
+#' @param threshold The threshold value for which the probability of exceeding is calculated (default is 12).
+#' @return A list containing:
+#'   - `alpha`: The shape parameter of the gamma distribution.
+#'   - `beta`: The scale parameter of the gamma distribution.
+#'   - `prob_exceed_threshold`: The probability that the power consumption exceeds the threshold.
+#'
+#' @importFrom stats pgamma
+#' @examples
+#' result <- gamma_with_mean_and_var(mu = 6, sigma2 = 12)
+#' print(result)
+#'
+#' @export
+gamma_with_mean_and_var <- function(mu, sigma2, threshold = 12) {
+  # Calculate alpha and beta from the given mean (mu) and variance (sigma2)
+  beta <- sigma2 / mu
+  alpha <- mu^2 / sigma2
+
+  # Calculate the probability that the power consumption exceeds the threshold
+  prob_exceed_threshold <- 1 - pgamma(threshold, shape = alpha, scale = beta)
+
+  # Return the results as a list
+  return(list(alpha = alpha, beta = beta, prob_exceed_threshold = prob_exceed_threshold))
+}
+
+
+#' Compute CDF, Probabilities, and Expectations for the Breakage Point Distribution
+#'
+#' This function calculates the cumulative distribution function (CDF), probabilities,
+#' expectations, and variances for the distribution of the breakage point in a 12-inch bar.
+#' The breakage point, denoted as Y, has a probability density function (PDF) defined by the user.
+#'
+#' The function can compute the following:
+#' - The CDF of Y.
+#' - Specific probabilities such as P(Y <equals x1), P(Y > x2), and P(x1 <equals Y <equals x2).
+#' - The expected value E(Y), the second moment E(Y^2), and the variance Var(Y).
+#' - The probability that the break occurs more than a specified distance from the expected break point.
+#' - The expected length of the shorter segment when the break occurs.
+#'
+#' @param pdf_function A function that calculates the PDF of Y.
+#' @param a Lower bound for the probability calculations (default is 0).
+#' @param b Upper bound for the probability calculations (default is 12, for the length of the bar).
+#' @param expected_break The expected break point (default is the mean of the distribution).
+#' @param x1 First threshold for probability calculations (default is 4).
+#' @param x2 Second threshold for probability calculations (default is 6).
+#' @param distance_from_expected The distance from the expected break point for probability calculation (default is 2).
+#' @return A list containing:
+#'   - `cdf` The cumulative distribution function.
+#'   - `probabilities` A list of probabilities for specific ranges.
+#'   - `expectations` A list containing the expected value, second moment, and variance.
+#'   - `shorter_segment_expectation` The expected length of the shorter segment when the break occurs.
+#'
+#' @examples
+#' # Define a simple PDF function for a uniform distribution over the range [0, 12]
+#' pdf_function <- function(y) { ifelse(y >= 0 & y <= 12, 1 / 12, 0) }
+#' breakage_analysis(pdf_function, x1 = 4, x2 = 6, distance_from_expected = 2)
+#'
+#' @export
+y_cdf_function <- function(pdf_function, a = 0, b = 12, expected_break = 6, x1 = 4, x2 = 6, distance_from_expected = 2) {
+  # Function to calculate the CDF from the given PDF
+  cdf_function <- function(y) {
+    integrate(pdf_function, a, y)$value
+  }
+
+  # Compute the CDF of Y
+  cdf_values <- sapply(seq(a, b, length.out = 100), cdf_function)
+
+  # Calculate probabilities
+  P_Y_less_than_x1 <- cdf_function(x1)
+  P_Y_greater_than_x2 <- 1 - cdf_function(x2)
+  P_Y_between_x1_and_x2 <- cdf_function(x2) - cdf_function(x1)
+
+  probabilities <- list(P_Y_less_than_x1 = P_Y_less_than_x1,
+                        P_Y_greater_than_x2 = P_Y_greater_than_x2,
+                        P_Y_between_x1_and_x2 = P_Y_between_x1_and_x2)
+
+  # Compute Expectations and Variance
+  E_Y <- integrate(function(y) y * pdf_function(y), a, b)$value
+  E_Y2 <- integrate(function(y) y^2 * pdf_function(y), a, b)$value
+  variance_Y <- E_Y2 - E_Y^2
+
+  expectations <- list(E_Y = E_Y,
+                       E_Y2 = E_Y2,
+                       Var_Y = variance_Y)
+
+  # Probability that the break occurs more than `distance_from_expected` from expected break point
+  P_more_than_distance_from_expected <- 1 - cdf_function(expected_break + distance_from_expected) + cdf_function(expected_break - distance_from_expected)
+
+  # Expected length of the shorter segment
+  shorter_segment_expectation <- expected_break / 2  # Assuming uniform break distribution
+
+  return(list(cdf = cdf_values,
+              probabilities = probabilities,
+              expectations = expectations,
+              shorter_segment_expectation = shorter_segment_expectation))
+}
+#' Compute CDF, Probabilities, and Expectations for the Breakage Point Distribution
+#'
+#' This function calculates the cumulative distribution function (CDF), probabilities,
+#' expectations, and variances for the distribution of the breakage point in a 12-inch bar.
+#' The breakage point, denoted as Y, has a probability density function (PDF) defined by the user.
+#'
+#' The function can compute the following:
+#' - The CDF of Y.
+#' - Specific probabilities such as P(Y <equals x1), P(Y > x2), and P(x1 <equals Y <equals x2).
+#' - The expected value E(Y), the second moment E(Y^2), and the variance Var(Y).
+#' - The probability that the break occurs more than a specified distance from the expected break point.
+#' - The expected length of the shorter segment when the break occurs.
+#'
+#' @param pdf_function A function that calculates the PDF of Y.
+#' @param a Lower bound for the probability calculations (default is 0).
+#' @param b Upper bound for the probability calculations (default is 12, for the length of the bar).
+#' @param expected_break The expected break point (default is the mean of the distribution).
+#' @param x1 First threshold for probability calculations (default is 4).
+#' @param x2 Second threshold for probability calculations (default is 6).
+#' @param distance_from_expected The distance from the expected break point for probability calculation (default is 2).
+#' @return A list containing:
+#'   - `cdf` The cumulative distribution function.
+#'   - `probabilities` A list of probabilities for specific ranges.
+#'   - `expectations` A list containing the expected value, second moment, and variance.
+#'   - `shorter_segment_expectation` The expected length of the shorter segment when the break occurs.
+#'
+#' @examples
+#' # Define a simple PDF function for a uniform distribution over the range [0, 12]
+#' pdf_function <- function(y) { ifelse(y >= 0 & y <= 12, 1 / 12, 0) }
+#' breakage_analysis(pdf_function, x1 = 4, x2 = 6, distance_from_expected = 2)
+#'
+#' @export
+y_pdf_cdf <- function(pdf_function, a = 0, b = 12, expected_break = 6, x1 = 4, x2 = 6, distance_from_expected = 2) {
+  # Function to calculate the CDF from the given PDF
+  cdf_function <- function(y) {
+    integrate(pdf_function, a, y)$value
+  }
+
+  # Compute the CDF of Y
+  cdf_values <- sapply(seq(a, b, length.out = 100), cdf_function)
+
+  # Calculate probabilities
+  P_Y_less_than_x1 <- cdf_function(x1)
+  P_Y_greater_than_x2 <- 1 - cdf_function(x2)
+  P_Y_between_x1_and_x2 <- cdf_function(x2) - cdf_function(x1)
+
+  probabilities <- list(P_Y_less_than_x1 = P_Y_less_than_x1,
+                        P_Y_greater_than_x2 = P_Y_greater_than_x2,
+                        P_Y_between_x1_and_x2 = P_Y_between_x1_and_x2)
+
+  # Compute Expectations and Variance
+  E_Y <- integrate(function(y) y * pdf_function(y), a, b)$value
+  E_Y2 <- integrate(function(y) y^2 * pdf_function(y), a, b)$value
+  variance_Y <- E_Y2 - E_Y^2
+
+  expectations <- list(E_Y = E_Y,
+                       E_Y2 = E_Y2,
+                       Var_Y = variance_Y)
+
+  # Probability that the break occurs more than `distance_from_expected` from expected break point
+  P_more_than_distance_from_expected <- 1 - cdf_function(expected_break + distance_from_expected) + cdf_function(expected_break - distance_from_expected)
+
+  # Expected length of the shorter segment
+  shorter_segment_expectation <- expected_break / 2  # Assuming uniform break distribution
+
+  return(list(cdf = cdf_values,
+              probabilities = probabilities,
+              expectations = expectations,
+              shorter_segment_expectation = shorter_segment_expectation))
+}
+
+#' This function plots the normal distribution for a given mean and standard deviation.
+#' It also answers the question: According to the Empirical Rule, what are the bounds for
+#' the middle 68% of the data?
+#'
+#' @param mu The mean of the distribution.
+#' @param sigma The standard deviation of the distribution.
+#' @param x_range The range of x-axis values for plotting.
+#'
+#' @return A plot of the normal distribution and the middle 68% range.
+#'
+#' @importFrom graphics curve abline
+#' @importFrom stats dnorm
+#' @examples
+#' plot_normal_and_empirical(mu = 82, sigma = 4)
+#'
+#' @export
+plot_normal_and_empirical <- function(mu, sigma, x_range = c(mu - 4*sigma, mu + 4*sigma)) {
+  # Plotting the normal distribution
+  curve(dnorm(x, mean = mu, sd = sigma), from = x_range[1], to = x_range[2],
+        col = "blue", lwd = 2, ylab = "Density", xlab = "X", main = "Normal Distribution")
+
+  # Marking the middle 68% according to the Empirical Rule
+  x68_low <- mu - sigma
+  x68_high <- mu + sigma
+  abline(v = c(x68_low, x68_high), col = "red", lwd = 2, lty = 2)
+
+  # Displaying bounds for middle 68% in the console
+  cat("The middle 68% of the data falls between:", x68_low, "and", x68_high, "\n")
+}
+
+#' Find Probability P(X < 83)
+#'
+#' This function calculates the probability that a normal random variable X is less than a given value.
+#'
+#' @param x The value to calculate the probability for.
+#' @param mu The mean of the distribution.
+#' @param sigma The standard deviation of the distribution.
+#'
+#' @return The probability P(X < x).
+#'
+#' @examples
+#' prob_less_than_83(mu = 82, sigma = 4, x = 83)
+#'
+#' @export
+prob_less_than_83 <- function(mu, sigma, x) {
+  pnorm(x, mean = mu, sd = sigma)
+}
+
+
+#' Find Probability P(X > 79)
+#'
+#' This function calculates the probability that a normal random variable X is greater than a given value.
+#'
+#' @param x The value to calculate the probability for.
+#' @param mu The mean of the distribution.
+#' @param sigma The standard deviation of the distribution.
+#'
+#' @return The probability P(X > x).
+#'
+#' @examples
+#' prob_greater_than_79(mu = 82, sigma = 4, x = 79)
+#'
+#' @export
+prob_greater_than_79 <- function(mu, sigma, x) {
+  1 - pnorm(x, mean = mu, sd = sigma)
+}
+
+
+#' Find Probability P(73 < X < 84)
+#'
+#' This function calculates the probability that a normal random variable X lies between two values.
+#'
+#' @param lower The lower bound of the interval.
+#' @param upper The upper bound of the interval.
+#' @param mu The mean of the distribution.
+#' @param sigma The standard deviation of the distribution.
+#'
+#' @return The probability P(lower < X < upper).
+#'
+#' @examples
+#' prob_between_73_and_84(mu = 82, sigma = 4, lower = 73, upper = 84)
+#'
+#' @export
+prob_between_73_and_84 <- function(mu, sigma, lower, upper) {
+  pnorm(upper, mean = mu, sd = sigma) - pnorm(lower, mean = mu, sd = sigma)
+}
+
+
+#' Find Probability P(X <equals x)
+#'
+#' This function calculates the probability that a normal random variable X is less than or equal to a given value.
+#'
+#' @param x The value to calculate the probability for.
+#' @param mu The mean of the distribution.
+#' @param sigma The standard deviation of the distribution.
+#'
+#' @return The probability P(X <equals x).
+#'
+#' @examples
+#' prob_less_than_or_equal_x(mu = 82, sigma = 4, x = 83)
+#'
+#' @export
+prob_less_than_or_equal_x <- function(mu, sigma, x) {
+  pnorm(x, mean = mu, sd = sigma)
+}
+
+
+#' Find Probability P(X >equals x)
+#'
+#' This function calculates the probability that a normal random variable X is greater than or equal to a given value.
+#'
+#' @param x The value to calculate the probability for.
+#' @param mu The mean of the distribution.
+#' @param sigma The standard deviation of the distribution.
+#'
+#' @return The probability P(X >equals x).
+#'
+#' @examples
+#' prob_greater_than_or_equal_x(mu = 82, sigma = 4, x = 79)
+#'
+#' @export
+prob_greater_than_or_equal_x <- function(mu, sigma, x) {
+  1 - pnorm(x, mean = mu, sd = sigma)
+}
+
+
+#' Find Probability P(X = upper and lower bounds)
+#'
+#' This function calculates the probability that a normal random variable X is exactly at the lower and upper bounds.
+#'
+#' @param lower The lower bound.
+#' @param upper The upper bound.
+#' @param mu The mean of the distribution.
+#' @param sigma The standard deviation of the distribution.
+#'
+#' @return The probability P(X = lower and upper).
+#'
+#' @examples
+#' prob_exact_bounds(mu = 82, sigma = 4, lower = 73, upper = 84)
+#'
+#' @export
+prob_exact_bounds <- function(mu, sigma, lower, upper) {
+  pnorm(upper, mean = mu, sd = sigma) - pnorm(lower, mean = mu, sd = sigma)
+}
+
+
+#' Find x such that P(X < x) = 0.97725
+#'
+#' This function calculates the value of x such that the cumulative probability P(X < x) equals a given probability.
+#'
+#' @param probability The cumulative probability for which to find x (e.g., 0.97725).
+#' @param mu The mean of the distribution.
+#' @param sigma The standard deviation of the distribution.
+#'
+#' @return The value of x corresponding to the given cumulative probability.
+#'
+#' @examples
+#' find_x_given_probability(mu = 82, sigma = 4, probability = 0.97725)
+#'
+#' @export
+find_x_given_probability <- function(mu, sigma, probability) {
+  qnorm(probability, mean = mu, sd = sigma)
+}
+
+#' Mean and Standard Deviation for Z
+#'
+#' This function returns the mean and standard deviation for the standard normal random variable Z,
+#' which is always 0 for the mean and 1 for the standard deviation.
+#'
+#' @return A list containing the mean and standard deviation of Z.
+#'
+#' @examples
+#' mean_and_sd_Z()
+#'
+#' @export
+mean_and_sd_Z <- function() {
+  list(mean = 0, sd = 1)
+}
+
+#' Plot the Distribution of Z
+#'
+#' This function plots the standard normal distribution with a mean of 0 and a standard deviation of 1.
+#'
+#' @param x_range The range of x values to plot the distribution.
+#'
+#' @return A plot of the standard normal distribution.
+#'
+#' @examples
+#' plot_standard_normal_distribution()
+#'
+#' @export
+plot_standard_normal_distribution <- function(x_range = c(-4, 4)) {
+  curve(dnorm(x), from = x_range[1], to = x_range[2], col = "blue",
+        main = "Standard Normal Distribution", xlab = "Z", ylab = "Density")
+}
+
+#' Find Probability P(Z < target)
+#'
+#' This function calculates the probability that the standard normal variable Z is less than a given target.
+#'
+#' @param target The value of Z for which to calculate the probability.
+#'
+#' @return The probability P(Z < target).
+#'
+#' @examples
+#' prob_Z_less_than_target(1.2)
+#'
+#' @export
+prob_Z_less_than_target <- function(target) {
+  pnorm(target)
+}
+
+#' Find Probability P(Z > target)
+#'
+#' This function calculates the probability that the standard normal variable Z is greater than a given target.
+#'
+#' @param target The value of Z for which to calculate the probability.
+#'
+#' @return The probability P(Z > target).
+#'
+#' @examples
+#' prob_Z_greater_than_target(1.2)
+#'
+#' @export
+prob_Z_greater_than_target <- function(target) {
+  1 - pnorm(target)
+}
+
+#' Find Probability P(lower < Z < upper)
+#'
+#' This function calculates the probability that the standard normal variable Z lies between two values, lower and upper.
+#'
+#' @param lower The lower bound for Z.
+#' @param upper The upper bound for Z.
+#'
+#' @return The probability P(lower < Z < upper).
+#'
+#' @examples
+#' prob_Z_between_target_values(-0.45, 1.96)
+#'
+#' @export
+prob_Z_between_target_values <- function(lower, upper) {
+  pnorm(upper) - pnorm(lower)
+}
+
+#' Find c such that P(Z < c) = target_probability
+#'
+#' This function finds the value of c such that P(Z < c) equals a given probability.
+#'
+#' @param target_probability The target probability for which to find the value of c.
+#'
+#' @return The value of c such that P(Z < c) = target_probability.
+#'
+#' @examples
+#' find_c_for_probability_target(0.845)
+#'
+#' @export
+find_c_for_probability_target <- function(target_probability) {
+  qnorm(target_probability)
+}
+
+#' Find c such that P(Z > c) = target_probability
+#'
+#' This function finds the value of c such that P(Z > c) equals a given probability.
+#'
+#' @param target_probability The target probability for the upper tail.
+#'
+#' @return The value of c such that P(Z > c) = target_probability.
+#'
+#' @examples
+#' find_c_for_probability_greater_than_target(0.845)
+#'
+#' @export
+find_c_for_probability_greater_than_target <- function(target_probability) {
+  qnorm(1 - target_probability)
+}
+
+#' Find c such that P(-c < Z < c) = target_probability
+#'
+#' This function finds the value of c such that P(-c < Z < c) equals a given probability.
+#'
+#' @param target_probability The desired cumulative probability for the two-tailed probability.
+#'
+#' @return The value of c such that P(-c < Z < c) = target_probability.
+#'
+#' @examples
+#' find_c_for_two_tailed_probability_target(0.845)
+#'
+#' @export
+find_c_for_two_tailed_probability_target <- function(target_probability) {
+  qnorm((1 + target_probability) / 2)
+}
+
+#' Calculate Mean and Standard Error of the Sampling Distribution
+#'
+#' This function calculates the mean and standard error of the sampling distribution of the sample mean.
+#' Given the population mean and population variance, it computes the mean and standard error for a sample of size n.
+#'
+#' @param population_mean The population mean (numeric).
+#' @param population_variance The population variance (numeric).
+#' @param sample_size The size of the sample (numeric).
+#'
+#' @return A list containing:
+#'   - `sampling_mean`: The mean of the sampling distribution.
+#'   - `standard_error`: The standard error of the sampling distribution.
+#'
+#' @examples
+#' sampling_distribution_mean_and_se(67, 36, 100)
+#'
+#' @export
+sampling_distribution_mean_and_se <- function(population_mean, population_variance, sample_size) {
+  sampling_mean <- population_mean
+  standard_error <- sqrt(population_variance / sample_size)
+
+  return(list(sampling_mean = sampling_mean, standard_error = standard_error))
+}
+
+#' Find P(Xbar < bound)
+#'
+#' This function calculates the probability that the sample mean Xbar is less than a specified bound,
+#' assuming the sample mean follows a normal distribution.
+#'
+#' @param bound The value of the bound for Xbar (numeric).
+#' @param population_mean The population mean (numeric).
+#' @param population_variance The population variance (numeric).
+#' @param sample_size The sample size (numeric).
+#'
+#' @return The probability P(Xbar) < bound).
+#' @examples
+#' prob_Xbar_less_than_bound(70, 67, 36, 100)
+#'
+#' @export
+prob_Xbar_less_than_bound <- function(bound, population_mean, population_variance, sample_size) {
+  standard_error <- sqrt(population_variance / sample_size)
+  z_score <- (bound - population_mean) / standard_error
+  pnorm(z_score)
+}
+
+#' Find P(Xbar > bound)
+#'
+#' This function calculates the probability that the sample mean Xbar is greater than a specified bound,
+#' assuming the sample mean follows a normal distribution.
+#'
+#' @param bound The value of the bound for Xbar (numeric).
+#' @param population_mean The population mean (numeric).
+#' @param population_variance The population variance (numeric).
+#' @param sample_size The sample size (numeric).
+#'
+#' @return The probability P(Xbar) > bound).
+#'
+#' @examples
+#' prob_Xbar_greater_than_bound(70, 67, 36, 100)
+#'
+#' @export
+prob_Xbar_greater_than_bound <- function(bound, population_mean, population_variance, sample_size) {
+  standard_error <- sqrt(population_variance / sample_size)
+  z_score <- (bound - population_mean) / standard_error
+  1 - pnorm(z_score)
+}
+
+#' Find P(Xbar <equals bound)
+#'
+#' This function calculates the probability that the sample mean Xbar is less than or equal to a specified bound,
+#' assuming the sample mean follows a normal distribution.
+#'
+#' @param bound The value of the bound for Xbar (numeric).
+#' @param population_mean The population mean (numeric).
+#' @param population_variance The population variance (numeric).
+#' @param sample_size The sample size (numeric).
+#'
+#' @return The probability P(Xbar <equals bound).
+#'
+#' @examples
+#' prob_Xbar_less_than_or_equals_bound(70, 67, 36, 100)
+#'
+#' @export
+prob_Xbar_less_than_or_equals_bound <- function(bound, population_mean, population_variance, sample_size) {
+  standard_error <- sqrt(population_variance / sample_size)
+  z_score <- (bound - population_mean) / standard_error
+  pnorm(z_score)
+}
+
+#' Find P(Xbar >equals bound)
+#'
+#' This function calculates the probability that the sample mean Xbar is greater than or equal to a specified bound,
+#' assuming the sample mean follows a normal distribution.
+#'
+#' @param bound The value of the bound for Xbar (numeric).
+#' @param population_mean The population mean (numeric).
+#' @param population_variance The population variance (numeric).
+#' @param sample_size The sample size (numeric).
+#'
+#' @return The probability P(Xbar >equals bound).
+#'
+#' @examples
+#' prob_Xbar_greater_than_or_equals_bound(70, 67, 36, 100)
+#'
+#' @export
+prob_Xbar_greater_than_or_equals_bound <- function(bound, population_mean, population_variance, sample_size) {
+  standard_error <- sqrt(population_variance / sample_size)
+  z_score <- (bound - population_mean) / standard_error
+  1 - pnorm(z_score)
+}
+
+#' Find P(lower <equals Xbar <equals upper)
+#'
+#' This function calculates the probability that the sample mean (Xbar) lies between two bounds, lower and upper,
+#' assuming the sample mean follows a normal distribution.
+#'
+#' @param lower The lower bound for (Xbar) (numeric).
+#' @param upper The upper bound for (Xbar) (numeric).
+#' @param population_mean The population mean (numeric).
+#' @param population_variance The population variance (numeric).
+#' @param sample_size The sample size (numeric).
+#'
+#' @return The probability P(lower <equals (Xbar) <equals upper).
+#'
+#' @examples
+#' prob_Xbar_between_bounds(45, 74, 67, 36, 100)
+#'
+#' @export
+prob_Xbar_between_bounds <- function(lower, upper, population_mean, population_variance, sample_size) {
+  standard_error <- sqrt(population_variance / sample_size)
+  z_lower <- (lower - population_mean) / standard_error
+  z_upper <- (upper - population_mean) / standard_error
+  pnorm(z_upper) - pnorm(z_lower)
+}
+
+#' Compare the Distributions for X and Xbar
+#'
+#' This function compares the distributions for X (a random variable) and Xbar (the sample mean)
+#' by calculating the mean and standard deviation for both. It also returns the difference in the standard deviations.
+#' Additionally, the function returns an explanation of the key differences between the two distributions.
+#'
+#' @param population_mean The population mean (numeric).
+#' @param population_sd The population standard deviation (numeric).
+#' @param sample_size The sample size (numeric).
+#'
+#' @return A list containing:
+#'   - `mean_X`: The mean of the distribution for X.
+#'   - `sd_X`: The standard deviation of the distribution for X.
+#'   - `mean_Xbar`: The mean of the distribution for Xbar.
+#'   - `sd_Xbar`: The standard deviation of the distribution for Xbar.
+#'   - `difference_in_sd`: The difference in the standard deviations between X and Xbar.
+#'   - `explanation`: A string explanation of the key differences between the two distributions.
+#'
+#' @examples
+#' compare_distributions(67, 6, 30)
+#'
+#' @export
+compare_distributions <- function(population_mean, population_sd, sample_size) {
+  # Mean of X is the population mean
+  mean_X <- population_mean
+
+  # Standard deviation of X is the population standard deviation
+  sd_X <- population_sd
+
+  # Mean of Xbar is also the population mean
+  mean_Xbar <- population_mean
+
+  # Standard deviation of Xbar (standard error) is the population standard deviation divided by the square root of the sample size
+  sd_Xbar <- population_sd / sqrt(sample_size)
+
+  # Calculate the difference in standard deviations
+  difference_in_sd <- sd_X - sd_Xbar
+
+  # Explanation of key differences
+  explanation <- paste(
+    "Key differences between the distribution for X and the distribution for Xbar:\n",
+    "1. The mean of X is the population mean, and the mean of Xbar is also the population mean.\n",
+    "2. The standard deviation of X is the population standard deviation.\n",
+    "3. The standard deviation of Xbar (also called the standard error) is smaller than the standard deviation of X.\n",
+    "4. The standard deviation of Xbar is equal to the population standard deviation divided by the square root of the sample size.\n",
+    "5. As the sample size increases, the standard deviation of Xbar decreases, making the sampling distribution narrower.\n"
+  )
+
+  # Return the results as a list
+  return(list(mean_X = mean_X, sd_X = sd_X, mean_Xbar = mean_Xbar, sd_Xbar = sd_Xbar,
+              difference_in_sd = difference_in_sd, explanation = explanation))
+}
+
+
+#' Calculate the Confidence Interval for a New Confidence Level with Detailed Information
+#'
+#' This function calculates the confidence interval for a new confidence level based on a given original
+#' confidence interval, sample size, and critical t-values for both the original and new confidence levels.
+#' It uses the t-distribution to calculate the new margin of error and confidence interval.
+#'
+#' @param lower_original The lower bound of the original confidence interval.
+#' @param upper_original The upper bound of the original confidence interval.
+#' @param n The sample size.
+#' @param confidence_original The original confidence level (e.g., 0.90 for 90%).
+#' @param confidence_new The new confidence level (e.g., 0.99 for 99%).
+#' @return A list containing the following:
+#'   - `new_confidence_interval`: The new confidence interval as a vector.
+#'   - `sample_mean`: The sample mean calculated from the original confidence interval.
+#'   - `margin_error_original`: The margin of error for the original confidence interval.
+#'   - `t_original`: The t-value for the original confidence level.
+#'   - `t_new`: The t-value for the new confidence level.
+#'   - `sample_standard_deviation`: The sample standard deviation.
+#'   - `margin_error_new`: The margin of error for the new confidence interval.
+#'
+#' @examples
+#' calculate_new_ci(15.34, 36.66, 5, 0.90, 0.99)
+#' @export
+calculate_new_ci <- function(lower_original, upper_original, n, confidence_original, confidence_new) {
+
+  # Calculate the sample mean from the original confidence interval
+  sample_mean <- (lower_original + upper_original) / 2
+
+  # Calculate the margin of error from the original confidence interval
+  margin_error_original <- (upper_original - lower_original) / 2
+
+  # Calculate sample standard deviation (s) based on the margin of error and sample size
+  t_original <- qt(1 - (1 - confidence_original) / 2, df = n - 1)  # t value for the original confidence level
+  s <- margin_error_original * sqrt(n) / t_original
+
+  # Calculate the margin of error for the new confidence interval
+  t_new <- qt(1 - (1 - confidence_new) / 2, df = n - 1)  # t value for the new confidence level
+  margin_error_new <- t_new * (s / sqrt(n))
+
+  # Calculate the new confidence interval
+  lower_new <- sample_mean - margin_error_new
+  upper_new <- sample_mean + margin_error_new
+
+  # Return the detailed results as a list
+  return(list(
+    new_confidence_interval = c(lower_new, upper_new),
+    sample_mean = sample_mean,
+    margin_error_original = margin_error_original,
+    t_original = t_original,
+    t_new = t_new,
+    sample_standard_deviation = s,
+    margin_error_new = margin_error_new
+  ))
+}
+
+#' Explanation of Type I and Type II Errors
+#'
+#' This function explains the concept of Type I and Type II errors in the context of hypothesis testing.
+#' It provides an interpretation based on a given scenario, where the null hypothesis and alternative hypothesis are defined.
+#'
+#' @param null_hypothesis The null hypothesis.
+#' @param alternative_hypothesis The alternative hypothesis.
+#' @param error_type The type of error to explain: "Type I" or "Type II".
+#' @return A string explaining the selected type of error.
+#'
+#' @examples
+#' error_explanation(
+#'   "The team will not get the first down",
+#'   "The team will get the first down",
+#'   "Type I"
+#' )
+#' @export
+error_explanation <- function(null_hypothesis, alternative_hypothesis, error_type) {
+  if (error_type == "Type I") {
+    return(paste("Type I Error (False Positive): You reject the null hypothesis ('", null_hypothesis,
+                 "') when in fact it is true. In this case, you would decide to go for the first down, but the team will not succeed.", sep = ""))
+  } else if (error_type == "Type II") {
+    return(paste("Type II Error (False Negative): You fail to reject the null hypothesis ('", null_hypothesis,
+                 "') when in fact it is false. In this case, you would decide to punt, but the team would have succeeded in getting the first down.", sep = ""))
+  } else {
+    return("Invalid error type. Please choose either 'Type I' or 'Type II'.")
+  }
+}
+
+#' Perform a Two-Tailed t-Test
+#'
+#' This function performs a two-tailed hypothesis test to determine if the mean gas mileage of a sample is
+#' different from the published mean.
+#'
+#' @param sample_mean The sample mean (e.g., 31.6 mpg).
+#' @param population_mean The population mean (e.g., 33.5 mpg).
+#' @param sample_sd The sample standard deviation (e.g., 3.4 mpg).
+#' @param sample_size The sample size (e.g., 12).
+#' @param alpha The significance level (default is 0.05).
+#'
+#' @return A list containing the t statistic, p-value, and decision ("Reject H0" or "Fail to reject H0").
+#'
+#' @importFrom stats pt
+#' @examples
+#' two_tailed__test(31.6, 33.5, 3.4, 12, 0.05)
+#' @export
+two_tailed__test <- function(sample_mean, population_mean, sample_sd, sample_size, alpha = 0.05) {
+  # Calculate the standard error
+  standard_error <- sample_sd / sqrt(sample_size)
+
+  # Calculate the t statistic
+  t_statistic <- (sample_mean - population_mean) / standard_error
+
+  # Calculate the degrees of freedom
+  df <- sample_size - 1
+
+  # Two-tailed p-value calculation
+  p_value <- 2 * pt(abs(t_statistic), df, lower.tail = FALSE)  # Multiply by 2 for two-tailed test
+
+  # Make the decision
+  if (p_value < alpha) {
+    decision <- "Reject H0"
+  } else {
+    decision <- "Fail to reject H0"
+  }
+
+  # Return the result
+  return(list(t_statistic = t_statistic, p_value = p_value, decision = decision))
+}
+
+#' Calculate the required sample size for a 90% confidence interval with a specified margin of error
+#'
+#' This function calculates the required sample size for a confidence interval of a population proportion
+#' with a given margin of error and confidence level.
+#'
+#' @param margin_of_error The desired margin of error for the confidence interval (numeric).
+#' @param confidence_level The desired confidence level (numeric, between 0 and 1).
+#' @param p_estimate The estimated proportion (default is 0.5 for a fair coin).
+#'
+#' @return The required sample size (numeric).
+#'
+#' @examples
+#' required_sample_size(0.1, 0.9)
+#' @export
+required_sample_size <- function(margin_of_error, confidence_level, p_estimate = 0.5) {
+  z_score <- qnorm(1 - (1 - confidence_level) / 2)
+  n <- (z_score^2 * p_estimate * (1 - p_estimate)) / (margin_of_error^2)
+  return(ceiling(n))
+}
+
+#' Perform a one-tailed hypothesis test for a population proportion
+#'
+#' This function tests whether the proportion of people who pray for world peace is less than
+#' 80% based on a sample proportion and a specified significance level.
+#'
+#' @param successes The number of people in the sample who pray for world peace.
+#' @param sample_size The total number of people in the sample.
+#' @param hypothesized_proportion The hypothesized population proportion (default is 0.80).
+#' @param alpha The significance level (default is 0.10).
+#'
+#' @return A list containing:
+#'   - `z_value`: The calculated z statistic (numeric).
+#'   - `critical_value`: The critical z value for the one-tailed test (numeric).
+#'   - `decision`: A string indicating whether to "Reject H0" or "Fail to Reject H0".
+#'
+#' @examples
+#' hypothesis_test_proportion_2(77, 110, 0.80, 0.10)
+#' @export
+hypothesis_test_proportion_2 <- function(successes, sample_size, hypothesized_proportion = 0.80, alpha = 0.10) {
+  # Calculate the sample proportion
+  p_hat <- successes / sample_size
+
+  # Calculate the standard error
+  standard_error <- sqrt((hypothesized_proportion * (1 - hypothesized_proportion)) / sample_size)
+
+  # Calculate the z statistic
+  z_value <- (p_hat - hypothesized_proportion) / standard_error
+
+  # Critical z value for a one-tailed test at alpha significance level
+  critical_value <- qnorm(1 - alpha)
+
+  # Decision based on the z value
+  if (z_value < critical_value) {
+    decision <- "Reject H0"
+  } else {
+    decision <- "Fail to Reject H0"
+  }
+
+  # Return results as a list
+  return(list(z_value = z_value, critical_value = critical_value, decision = decision))
+}
+
+#' Construct a Confidence Interval for the Variance of a Normally Distributed Population
+#'
+#' This function constructs a 95% confidence interval for the variance of a normally distributed population based on a sample of data.
+#' It uses the chi-squared distribution to calculate the confidence interval for the population variance (sigma^2) and compares the
+#' sample variance to the claimed population variance.
+#'
+#' The formula for the confidence interval is based on the chi-squared distribution:
+#'
+#' The confidence interval for the variance is given by:
+#'
+#' ( (n-1) * s^2 ) / chi_squared_critical_upper <= sigma^2 <= ( (n-1) * s^2 ) / chi_squared_critical_lower
+#'
+#' Where:
+#' - s^2 is the sample variance
+#' - n is the sample size
+#' - chi_squared_critical_upper is the upper chi-squared critical value for (1 - alpha/2) with n-1 degrees of freedom
+#' - chi_squared_critical_lower is the lower chi-squared critical value for alpha/2 with n-1 degrees of freedom
+#'
+#' @param data A numeric vector containing the sample data.
+#' @param alpha The significance level (default is 0.05 for a 95% confidence interval).
+#' @return A list containing:
+#'   - lower_bound: The lower bound of the confidence interval for the population variance.
+#'   - upper_bound: The upper bound of the confidence interval for the population variance.
+#'   - sample_variance: The sample variance.
+#'   - sample_size: The sample size.
+#'   - degrees_of_freedom: The degrees of freedom used in the chi-squared distribution.
+#'
+#' @importFrom stats qt qchisq var
+#' @examples
+#' battery_lifetimes <- c(1.9, 2.4, 3.0, 3.5, 4.2)
+#' result <- confidence_interval_variance(battery_lifetimes)
+#' print(result)
+#'
+#' @export
+confidence_interval_variance <- function(data, alpha = 0.05) {
+  # Sample size and variance
+  n <- length(data)
+  sample_variance <- var(data)
+
+  # Degrees of freedom
+  degrees_of_freedom <- n - 1
+
+  # Chi-squared critical values
+  chi_squared_critical_lower <- qchisq(alpha / 2, degrees_of_freedom)
+  chi_squared_critical_upper <- qchisq(1 - alpha / 2, degrees_of_freedom)
+
+  # Confidence interval for the population variance
+  lower_bound <- (degrees_of_freedom * sample_variance) / chi_squared_critical_upper
+  upper_bound <- (degrees_of_freedom * sample_variance) / chi_squared_critical_lower
+
+  # Return the results as a list
+  return(list(
+    lower_bound = lower_bound,
+    upper_bound = upper_bound,
+    sample_variance = sample_variance,
+    sample_size = n,
+    degrees_of_freedom = degrees_of_freedom
+  ))
+}
+
+#' Perform a Paired T-Test for MPG Differences
+#'
+#' This function conducts a paired t-test to test whether there is a significant difference
+#' between the professor's calculated miles per gallon (MPG) and the car's computer estimate.
+#' It performs a two-tailed hypothesis test for the mean difference.
+#'
+#' The hypotheses are:
+#' - H0: The mean difference in MPG = 0 (no difference)
+#' - Ha: The mean difference in MPG <> 0 (there is a difference)
+#'
+#' @param computer A numeric vector representing the MPG values from the car's computer.
+#' @param driver A numeric vector representing the MPG values calculated by the professor.
+#' @return A list containing:
+#'   - `t_statistic`: The calculated t statistic.
+#'   - `p_value`: The p-value for the test.
+#'   - `decision`: A string indicating whether to "Reject H0" or "Fail to reject H0".
+#'
+#' @examples
+#' computer <- c(41.5, 45, 43.2, 43.2, 48.4, 46.8, 39.2, 43.5, 44.3, 43.3)
+#' driver <- c(36.5, 40.5, 41, 38.8, 45.4, 45.7, 34.2, 39.8, 44.9, 47.5)
+#' result <- paired_t_test_mpg(computer, driver)
+#' print(result)
+#'
+#' @export
+paired_t_test_mpg <- function(computer, driver) {
+  # Check if the input vectors have the same length
+  if (length(computer) != length(driver)) {
+    stop("The computer and driver data must have the same length.")
+  }
+
+  # Calculate the differences
+  differences <- computer - driver
+
+  # Perform the t-test
+  t_test_result <- t.test(differences)
+
+  # Extract the t-statistic and p-value
+  t_statistic <- t_test_result$statistic
+  p_value <- t_test_result$p.value
+
+  # Make a decision based on the p-value
+  decision <- ifelse(p_value < 0.05, "Reject H0", "Fail to reject H0")
+
+  # Return the results
+  return(list(
+    t_statistic = t_statistic,
+    p_value = p_value,
+    decision = decision
+  ))
+}
+
+#' Compare Two Proportions
+#'
+#' This function performs a hypothesis test and calculates a confidence interval for the difference between
+#' two population proportions (e.g., proportion of freshmen and seniors opposing a plan). It also determines
+#' whether to reject or fail to reject the null hypothesis and provides a simple explanation of the result.
+#'
+#' @param p1 The proportion of freshmen who oppose the plan.
+#' @param n1 The sample size of freshmen.
+#' @param p2 The proportion of seniors who oppose the plan.
+#' @param n2 The sample size of seniors.
+#' @param confidence_level The confidence level for the confidence interval (e.g., 0.95 for 95% confidence).
+#' @param alpha The significance level (e.g., 0.05 for a 5% significance level).
+#'
+#' @return A list containing:
+#'   - `test_statistic`: The z-test statistic for comparing the two proportions.
+#'   - `p_value`: The p-value of the hypothesis test.
+#'   - `reject_H0`: A message indicating whether to reject or fail to reject the null hypothesis.
+#'   - `confidence_interval`: The confidence interval for the difference in proportions.
+#'   - `explanation`: A simple explanation of the result.
+#'
+#' @examples
+#' result <- compare_two_proportions(160/200, 200, 20/100, 100, 0.95, 0.05)
+#' print(result)
+#'
+#' @export
+compare_two_proportions <- function(p1, n1, p2, n2, confidence_level = 0.95, alpha = 0.05) {
+
+  # Step 1: Hypothesis Test
+  # Null hypothesis: p1 = p2
+  # Alternative hypothesis: p1 != p2
+
+  # Calculate the pooled proportion
+  pooled_proportion <- (p1 * n1 + p2 * n2) / (n1 + n2)
+
+  # Standard error of the difference in proportions
+  standard_error <- sqrt(pooled_proportion * (1 - pooled_proportion) * (1/n1 + 1/n2))
+
+  # Test statistic (z-value)
+  test_statistic <- (p1 - p2) / standard_error
+
+  # Step 2: Calculate p-value
+  p_value <- 2 * (1 - pnorm(abs(test_statistic)))  # two-tailed test
+
+  # Step 3: Determine whether to reject the null hypothesis
+  reject_H0 <- ifelse(p_value < alpha, "Reject H0", "Fail to reject H0")
+
+  # Step 4: Confidence Interval for the difference in proportions
+  margin_of_error <- qnorm(1 - (1 - confidence_level) / 2) * standard_error
+  lower_bound <- (p1 - p2) - margin_of_error
+  upper_bound <- (p1 - p2) + margin_of_error
+  confidence_interval <- c(lower_bound, upper_bound)
+
+  # Step 5: Explanation for a non-statistical audience
+  explanation <- ifelse(reject_H0 == "Reject H0",
+                        "There is a statistically significant difference in the proportions of freshmen and seniors who oppose the plan.",
+                        "There is no statistically significant difference in the proportions of freshmen and seniors who oppose the plan.")
+
+  # Return the results as a list
+  return(list(
+    test_statistic = test_statistic,
+    p_value = p_value,
+    reject_H0 = reject_H0,
+    confidence_interval = confidence_interval,
+    explanation = explanation
+  ))
+}
+
+#' Perform a Two-Sample T-Test for the Difference in Means
+#'
+#' This function performs a two-sample t-test to determine if the mean of one group is greater than the mean of another group.
+#' The function calculates the test statistic, the p-value, and provides a conclusion based on the significance level.
+#'
+#' @param mean_1 The mean of the first sample (numeric).
+#' @param sd_1 The standard deviation of the first sample (numeric).
+#' @param n_1 The sample size of the first sample (integer).
+#' @param mean_2 The mean of the second sample (numeric).
+#' @param sd_2 The standard deviation of the second sample (numeric).
+#' @param n_2 The sample size of the second sample (integer).
+#' @param alpha The significance level for the test (default is 0.05).
+#'
+#' @return A list containing:
+#'   - `t_statistic`: The t-test statistic (numeric).
+#'   - `p_value`: The p-value for the hypothesis test.
+#'   - `reject_H0`: A string indicating whether to reject or fail to reject the null hypothesis.
+#'
+#' @importFrom stats pt
+#' @examples
+#' result <- two_sample_t_test(10.40, 4.83, 97, 9.26, 4.68, 148, 0.05)
+#' print(result)
+#'
+#' @export
+two_sample_t_test <- function(mean_1, sd_1, n_1,
+                              mean_2, sd_2, n_2,
+                              alpha = 0.05) {
+
+  # Calculate the standard error of the difference in means
+  se_diff <- sqrt((sd_1^2 / n_1) + (sd_2^2 / n_2))
+
+  # Calculate the t-test statistic for a one-tailed test (first group > second group)
+  t_statistic <- (mean_1 - mean_2) / se_diff
+
+  # Calculate the degrees of freedom using the formula for unequal variances
+  df <- ((sd_1^2 / n_1 + sd_2^2 / n_2)^2) /
+    (( (sd_1^2 / n_1)^2 / (n_1 - 1)) +
+       ((sd_2^2 / n_2)^2 / (n_2 - 1)))
+
+  # Calculate the p-value for the one-tailed test
+  p_value <- 1 - pt(t_statistic, df)  # For a one-tailed test
+
+  # Make a decision based on the p-value
+  reject_H0 <- ifelse(p_value < alpha, "Reject H0: The mean of group 1 is greater than group 2",
+                      "Fail to reject H0: No significant difference between the means")
+
+  # Return the results as a list
+  return(list(t_statistic = t_statistic,
+              p_value = p_value,
+              reject_H0 = reject_H0))
 }

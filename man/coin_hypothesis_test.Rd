@@ -11,7 +11,7 @@ coin_hypothesis_test(heads, total_flips, alpha = 0.01)
 
 \item{total_flips}{An integer representing the total number of coin flips (integer).}
 
-\item{alpha}{A numeric value representing the significance level (default is 0.01, should be between 0 and 1).}
+\item{alpha}{A numeric value representing the significance level (default is 0.01).}
 }
 \value{
 A list containing:
@@ -23,7 +23,7 @@ A list containing:
 }
 \description{
 This function tests the claim that a coin is fair (p = 0.5) against the alternative
-that it is not fair (p ≠ 0.5) using a two-tailed hypothesis test. The function
+that it is not fair (p <> 0.5) using a two-tailed hypothesis test. The function
 calculates the z statistic for the observed number of heads in a series of coin flips,
 and compares it against the critical value derived from the specified significance level.
 }
@@ -32,7 +32,7 @@ The null hypothesis (H0) states that the coin is fair, while the alternative hyp
 the coin is not fair.
 }
 \examples{
-coin_test_result <- coin_hypothesis_test(heads = 44, total_flips = 100)
+coin_test_result <- coin_hypothesis_test(heads = 56, total_flips = 100)
 print(coin_test_result)
 
 }
