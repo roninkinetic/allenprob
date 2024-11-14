@@ -4,9 +4,19 @@
 \alias{hypothesis_test_proportion}
 \title{Perform a Two-Tailed Hypothesis Test for a Proportion}
 \usage{
-hypothesis_test_proportion(successes, trials, significance_level)
+hypothesis_test_proportion(n, x, p0, alpha = 0.05)
+
+hypothesis_test_proportion(n, x, p0, alpha = 0.05)
 }
 \arguments{
+\item{n}{Sample size, the number of patients or cases.}
+
+\item{x}{The number of patients or cases with the outcome of interest (e.g., adverse symptoms).}
+
+\item{p0}{The hypothesized population proportion (e.g., 0.10 for 10\%).}
+
+\item{alpha}{The significance level for the test (default is 0.05).}
+
 \item{successes}{The number of successes in the sample (integer).}
 
 \item{trials}{The number of trials in the sample (sample size, integer).}
@@ -20,11 +30,15 @@ A list containing:
 \item \code{p_value}: The calculated p-value (numeric).
 \item \code{result}: A string indicating whether to "Reject the null hypothesis" or "Fail to reject the null hypothesis."
 }
+
+A list containing the sampling distribution, test statistic, p-value, rejection region, decision, and conclusion, with all work shown.
 }
 \description{
 This function performs a two-tailed hypothesis test for a proportion to determine
 if the sample proportion significantly differs from the null hypothesis proportion.
 The default null hypothesis proportion is set to 0.5.
+
+Performs a hypothesis test to determine if the population proportion differs from a specified value.
 }
 \details{
 The calculation involves the following steps:
@@ -55,8 +69,11 @@ z_critical = qnorm(1 - (alpha / 2))
 \item Otherwise, fail to reject the null hypothesis.
 }
 }
+
+This function checks assumptions, calculates the test statistic, p-value, and provides a one-tailed or two-tailed hypothesis test on the population proportion.
 }
 \examples{
 hypothesis_test_proportion(55, 100, 0.05)
 
+hypothesis_test_proportion(n = 440, x = 23, p0 = 0.10, alpha = 0.05)
 }

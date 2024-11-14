@@ -2318,3 +2318,572 @@ two_sample_t_test <- function(mean_1, sd_1, n_1,
               p_value = p_value,
               reject_H0 = reject_H0))
 }
+#' @title Hypothesis Test for Candidate Approval Rating
+#' @description Performs a hypothesis test to determine if Candidate A's approval rating is greater than 50%.
+#' @param n Sample size, the number of voters surveyed.
+#' @param x The number of voters who said they might vote for Candidate A.
+#' @param p0 The hypothesized population proportion (0.50 in this case).
+#' @param alpha The significance level for the test (default is 0.05).
+#' @return A list containing the detailed steps, including the assumptions, critical z-value, test statistic,
+#' p-value, decision, and conclusion, with all work shown.
+#' @details
+#' This function calculates the test statistic and p-value for a one-sample proportion hypothesis test.
+#' It checks the assumptions, sets up the null and alternative hypotheses, determines the rejection region,
+#' and interprets the results based on the significance level.
+#' @examples
+#' hypothesis_test_approval(n = 100, x = 54, p0 = 0.50, alpha = 0.05)
+#' @export
+hypothesis_test_approval <- function(n, x, p0 = 0.50, alpha = 0.05) {
+  # Step (a): Check the assumption
+  np0 <- n * p0
+  n1_minus_p0 <- n * (1 - p0)
+  assumption_check <- np0 >= 10 && n1_minus_p0 >= 10
+  assumption_details <- paste(
+    "Check np0 >= 10 and n(1 - p0) >= 10:",
+    "np0 =", np0,
+    ", n(1 - p0) =", n1_minus_p0,
+    "=> Normal approximation is valid:", assumption_check
+  )
+
+  # Step (b): State the hypotheses
+  hypotheses <- list(
+    H0 = "p = 0.50 (Candidate A's approval rating is 50%)",
+    Ha = "p > 0.50 (Candidate A's approval rating is greater than 50%)"
+  )
+
+  # Step (c): Determine the rejection region
+  z_critical <- qnorm(1 - alpha)
+  rejection_region <- paste("Reject H0 if z > z_critical, where z_critical =", round(z_critical, 4))
+
+  # Step (d): Calculate the test statistic
+  p_hat <- x / n
+  standard_error <- sqrt((p0 * (1 - p0)) / n)
+  z <- (p_hat - p0) / standard_error
+  test_statistic_details <- paste(
+    "Calculate z = (p_hat - p0) / SE:",
+    "p_hat =", p_hat,
+    ", p0 =", p0,
+    ", SE =", round(standard_error, 4),
+    ", z =", round(z, 4)
+  )
+
+  # Step (e): Obtain the p-value
+  p_value <- 1 - pnorm(z)
+  p_value_details <- paste("One-tailed p-value for z =", round(z, 4), "=> p-value =", round(p_value, 4))
+
+  # Step (f): Decision and Conclusion
+  decision <- if (z > z_critical) "Reject H0" else "Do not reject H0"
+  conclusion <- if (z > z_critical) {
+    "There is significant evidence that Candidate A's approval rating is greater than 50%."
+  } else {
+    "There is not enough evidence to conclude that Candidate A's approval rating is greater than 50%."
+  }
+
+  # Return all details in the output
+  return(list(
+    assumption_details = assumption_details,
+    hypotheses = hypotheses,
+    rejection_region = rejection_region,
+    test_statistic_details = test_statistic_details,
+    p_value_details = p_value_details,
+    decision = decision,
+    conclusion = conclusion
+  ))
+}
+
+#' @title Hypothesis Test with Rejection Region for Average Radiation Level
+#' @description Performs a hypothesis test to determine if the average radiation level in a laboratory differs from a specified mean (e.g., 420).
+#' @param n Sample size, the number of radiation level measurements.
+#' @param sample_mean The sample mean of radiation levels.
+#' @param mu The hypothesized population mean (default is 420).
+#' @param sigma The population standard deviation of the radiation levels (default is 10).
+#' @param alpha The significance level for the test (default is 0.01).
+#' @return A list containing the test type, rejection region, test statistic, p-value, decision, and conclusion, with all work shown.
+#' @details
+#' This function calculates the test statistic and p-value for a two-tailed hypothesis test on the average radiation level.
+#' It provides step-by-step output including the rejection region, test statistic, and decision criteria.
+#' @examples
+#' hypothesis_test_with_rejection_region(n = 49, sample_mean = 415.7, mu = 420, sigma = 10, alpha = 0.01)
+#' @export
+hypothesis_test_with_rejection_region <- function(n, sample_mean, mu = 420, sigma = 10, alpha = 0.01) {
+  # Step (a): Determine the type of test
+  test_type <- "Two-tailed test, since Ha: μ ≠ 420"
+
+  # Step (b): Determine the rejection region
+  z_critical <- qnorm(1 - alpha / 2)  # two-tailed test, so we use alpha/2
+  rejection_region <- paste("Reject H0 if z < -", round(z_critical, 4), " or z > ", round(z_critical, 4))
+
+  # Step (c): Calculate the test statistic
+  standard_error <- sigma / sqrt(n)
+  z <- (sample_mean - mu) / standard_error
+  test_statistic_details <- paste(
+    "Calculate z = (sample_mean - mu) / SE:",
+    "sample_mean =", sample_mean,
+    ", mu =", mu,
+    ", SE =", round(standard_error, 4),
+    ", z =", round(z, 4)
+  )
+
+  # Step (d): Obtain the p-value
+  p_value <- 2 * (1 - pnorm(abs(z)))  # two-tailed p-value
+  p_value_details <- paste("Two-tailed p-value for z =", round(z, 4), "=> p-value =", round(p_value, 4))
+
+  # Step (c): Decision based on rejection region
+  decision <- if (abs(z) > z_critical) "Reject H0" else "Do not reject H0"
+  conclusion <- if (abs(z) > z_critical) {
+    "There is significant evidence that the average radiation level differs from 420."
+  } else {
+    "There is not enough evidence to conclude that the average radiation level differs from 420."
+  }
+
+  # Return all details in the output
+  return(list(
+    test_type = test_type,
+    rejection_region = rejection_region,
+    test_statistic_details = test_statistic_details,
+    p_value_details = p_value_details,
+    decision = decision,
+    conclusion = conclusion
+  ))
+}
+
+#' @title Generic Hypothesis Test for Population Mean
+#' @description Performs a hypothesis test to determine if the population mean differs from a specified value.
+#' @param data A numeric vector containing the sample data.
+#' @param mu The hypothesized population mean to test against.
+#' @param alpha The significance level for the test (default is 0.05).
+#' @return A list containing the test type, test statistic, p-value, confidence interval, decision, and conclusion, with all work shown.
+#' @details
+#' This function calculates the test statistic, p-value, and confidence interval for a two-tailed hypothesis test on the population mean.
+#' It assumes the data are normally distributed and uses a t-test when the population standard deviation is unknown.
+#' @examples
+#' data <- c(34,54,73,38,89,52,75,33,50,39,42,42,40,66,72,85,28,71,52,47,41,36,33,38,49,51,55,63,72,78)
+#' hypothesis_test_mean(data = data, mu = 50, alpha = 0.05)
+#' @export
+hypothesis_test_mean <- function(data, mu, alpha = 0.05) {
+  # Step (a): Determine the type of test
+  test_type <- "Two-tailed test, since Ha: μ ≠ hypothesized mean"
+
+  # Step (b): Calculate sample statistics
+  n <- length(data)
+  sample_mean <- mean(data)
+  sample_sd <- sd(data)
+  standard_error <- sample_sd / sqrt(n)
+
+  # Step (c): Calculate the test statistic
+  t_stat <- (sample_mean - mu) / standard_error
+  test_statistic_details <- paste(
+    "Calculate t = (sample_mean - mu) / SE:",
+    "sample_mean =", round(sample_mean, 4),
+    ", mu =", mu,
+    ", SE =", round(standard_error, 4),
+    ", t =", round(t_stat, 4)
+  )
+
+  # Step (d): Determine the rejection region
+  t_critical <- qt(1 - alpha / 2, df = n - 1)
+  rejection_region <- paste("Reject H0 if t < -", round(t_critical, 4), " or t > ", round(t_critical, 4))
+
+  # Step (e): Obtain the p-value
+  p_value <- 2 * (1 - pt(abs(t_stat), df = n - 1))  # two-tailed p-value
+  p_value_details <- paste("Two-tailed p-value for t =", round(t_stat, 4), "=> p-value =", round(p_value, 4))
+
+  # Step (f): Decision and Conclusion
+  decision <- if (abs(t_stat) > t_critical) "Reject H0" else "Do not reject H0"
+  conclusion <- if (abs(t_stat) > t_critical) {
+    "There is significant evidence that the population mean differs from the hypothesized mean."
+  } else {
+    "There is not enough evidence to conclude that the population mean differs from the hypothesized mean."
+  }
+
+  # Step (g): Calculate the confidence interval
+  margin_of_error <- t_critical * standard_error
+  ci_lower <- sample_mean - margin_of_error
+  ci_upper <- sample_mean + margin_of_error
+  confidence_interval <- paste("Confidence interval: (", round(ci_lower, 4), ", ", round(ci_upper, 4), ")")
+
+  # Return all details in the output
+  return(list(
+    test_type = test_type,
+    test_statistic_details = test_statistic_details,
+    rejection_region = rejection_region,
+    p_value_details = p_value_details,
+    decision = decision,
+    conclusion = conclusion,
+    confidence_interval = confidence_interval
+  ))
+}
+
+#' @title Hypothesis Test for Population Proportion
+#' @description Performs a hypothesis test to determine if the population proportion differs from a specified value.
+#' @param n Sample size, the number of patients or cases.
+#' @param x The number of patients or cases with the outcome of interest (e.g., adverse symptoms).
+#' @param p0 The hypothesized population proportion (e.g., 0.10 for 10%).
+#' @param alpha The significance level for the test (default is 0.05).
+#' @return A list containing the sampling distribution, test statistic, p-value, rejection region, decision, and conclusion, with all work shown.
+#' @details
+#' This function checks assumptions, calculates the test statistic, p-value, and provides a one-tailed or two-tailed hypothesis test on the population proportion.
+#' @examples
+#' hypothesis_test_proportion(n = 440, x = 23, p0 = 0.10, alpha = 0.05)
+#' @export
+hypothesis_test_proportion <- function(n, x, p0, alpha = 0.05) {
+  # Step (a): Sampling distribution of the sample proportion
+  sample_proportion <- x / n
+  standard_error <- sqrt((p0 * (1 - p0)) / n)
+  sampling_distribution <- paste("Sampling distribution: N(mean =", round(p0, 4),
+                                 ", standard deviation =", round(standard_error, 4), ")")
+
+  # Step (b1): Assumption check
+  np0 <- n * p0
+  n1_minus_p0 <- n * (1 - p0)
+  assumption_check <- np0 >= 10 && n1_minus_p0 >= 10
+  assumption_details <- paste(
+    "Check np0 >= 10 and n(1 - p0) >= 10:",
+    "np0 =", np0,
+    ", n(1 - p0) =", n1_minus_p0,
+    "=> Normal approximation is valid:", assumption_check
+  )
+
+  # Step (b2): State the hypotheses
+  hypotheses <- list(
+    H0 = paste("p =", p0, "(The proportion of patients with adverse symptoms is", p0, ")"),
+    Ha = paste("p <", p0, "(The proportion of patients with adverse symptoms is less than", p0, ")")
+  )
+
+  # Step (c): Determine the rejection region for a left-tailed test
+  z_critical <- qnorm(alpha)
+  rejection_region <- paste("Reject H0 if z <", round(z_critical, 4))
+
+  # Step (d): Calculate the test statistic
+  z <- (sample_proportion - p0) / standard_error
+  test_statistic_details <- paste(
+    "Calculate z = (sample_proportion - p0) / SE:",
+    "sample_proportion =", round(sample_proportion, 4),
+    ", p0 =", p0,
+    ", SE =", round(standard_error, 4),
+    ", z =", round(z, 4)
+  )
+
+  # Step (e): Obtain the p-value for a one-tailed test
+  p_value <- pnorm(z)
+  p_value_details <- paste("One-tailed p-value for z =", round(z, 4), "=> p-value =", round(p_value, 4))
+
+  # Step (f): Decision and Conclusion
+  decision <- if (z < z_critical) "Reject H0" else "Do not reject H0"
+  conclusion <- if (z < z_critical) {
+    "There is strong evidence that fewer than 10% of patients taking this medication have adverse symptoms."
+  } else {
+    "There is not enough evidence to conclude that fewer than 10% of patients taking this medication have adverse symptoms."
+  }
+
+  # Return all details in the output
+  return(list(
+    sampling_distribution = sampling_distribution,
+    assumption_details = assumption_details,
+    hypotheses = hypotheses,
+    rejection_region = rejection_region,
+    test_statistic_details = test_statistic_details,
+    p_value_details = p_value_details,
+    decision = decision,
+    conclusion = conclusion
+  ))
+}
+
+#' @title Hypothesis Test for Population Proportion (Right-Tailed)
+#' @description Performs a hypothesis test to determine if the population proportion is greater than a specified value.
+#' @param n Sample size, the number of cases (e.g., voters).
+#' @param x The number of cases with the outcome of interest (e.g., voters supporting a candidate).
+#' @param p0 The hypothesized population proportion (e.g., 0.50 for 50%).
+#' @param alpha The significance level for the test (default is 0.05).
+#' @return A list containing the sampling distribution, assumptions check, hypotheses, test statistic, p-value, rejection region, decision, and conclusion.
+#' @details
+#' This function checks assumptions, calculates the test statistic, and provides a one-tailed hypothesis test on the population proportion.
+#' @examples
+#' hypothesis_test_proportion_right_tailed(n = 100, x = 54, p0 = 0.50, alpha = 0.05)
+#' @export
+hypothesis_test_proportion_right_tailed <- function(n, x, p0, alpha = 0.05) {
+  # Step (a): Check the assumptions
+  sample_proportion <- x / n
+  np0 <- n * p0
+  n1_minus_p0 <- n * (1 - p0)
+  assumption_check <- np0 >= 10 && n1_minus_p0 >= 10
+  assumption_details <- paste(
+    "Check np0 >= 10 and n(1 - p0) >= 10:",
+    "np0 =", np0,
+    ", n(1 - p0) =", n1_minus_p0,
+    "=> Normal approximation is valid:", assumption_check
+  )
+
+  # Step (b): State the hypotheses
+  hypotheses <- list(
+    H0 = paste("p =", p0, "(The proportion is", p0, ")"),
+    Ha = paste("p >", p0, "(The proportion is greater than", p0, ")")
+  )
+
+  # Step (c): Determine the rejection region for a right-tailed test
+  z_critical <- qnorm(1 - alpha)
+  rejection_region <- paste("Reject H0 if z >", round(z_critical, 4))
+
+  # Step (d): Calculate the test statistic
+  standard_error <- sqrt((p0 * (1 - p0)) / n)
+  z <- (sample_proportion - p0) / standard_error
+  test_statistic_details <- paste(
+    "Calculate z = (sample_proportion - p0) / SE:",
+    "sample_proportion =", round(sample_proportion, 4),
+    ", p0 =", p0,
+    ", SE =", round(standard_error, 4),
+    ", z =", round(z, 4)
+  )
+
+  # Step (e): Obtain the p-value for a right-tailed test
+  p_value <- 1 - pnorm(z)
+  p_value_details <- paste("One-tailed p-value for z =", round(z, 4), "=> p-value =", round(p_value, 4))
+
+  # Step (f): Decision and Conclusion
+  decision <- if (z > z_critical) "Reject H0" else "Do not reject H0"
+  conclusion <- if (z > z_critical) {
+    "There is significant evidence that the proportion is greater than the hypothesized value."
+  } else {
+    "There is not enough evidence to conclude that the proportion is greater than the hypothesized value."
+  }
+
+  # Return all details in the output
+  return(list(
+    sampling_distribution = paste("Sampling distribution: N(mean =", p0,
+                                  ", standard deviation =", round(standard_error, 4), ")"),
+    assumption_details = assumption_details,
+    hypotheses = hypotheses,
+    rejection_region = rejection_region,
+    test_statistic_details = test_statistic_details,
+    p_value_details = p_value_details,
+    decision = decision,
+    conclusion = conclusion
+  ))
+}
+
+#' @title Hypothesis Test for Population Proportion (Left-Tailed)
+#' @description Performs a hypothesis test to determine if the population proportion is less than a specified value.
+#' @param n Sample size, the number of cases (e.g., patients).
+#' @param x The number of cases with the outcome of interest (e.g., patients with adverse symptoms).
+#' @param p0 The hypothesized population proportion (e.g., 0.10 for 10%).
+#' @param alpha The significance level for the test (default is 0.05).
+#' @return A list containing the sampling distribution, assumptions check, hypotheses, test statistic, p-value, rejection region, decision, and conclusion.
+#' @details
+#' This function checks assumptions, calculates the test statistic, and performs a one-tailed (left-tailed) hypothesis test on the population proportion.
+#' @examples
+#' hypothesis_test_proportion_left_tailed(n = 100, x = 54, p0 = 0.50, alpha = 0.05)
+#' @export
+hypothesis_test_proportion_left_tailed <- function(n, x, p0, alpha = 0.05) {
+  # Step (a): Check the assumptions
+  sample_proportion <- x / n
+  np0 <- n * p0
+  n1_minus_p0 <- n * (1 - p0)
+  assumption_check <- np0 >= 10 && n1_minus_p0 >= 10
+  assumption_details <- paste(
+    "Check np0 >= 10 and n(1 - p0) >= 10:",
+    "np0 =", np0,
+    ", n(1 - p0) =", n1_minus_p0,
+    "=> Normal approximation is valid:", assumption_check
+  )
+
+  # Step (b): State the hypotheses
+  hypotheses <- list(
+    H0 = paste("p =", p0, "(The proportion is", p0, ")"),
+    Ha = paste("p <", p0, "(The proportion is less than", p0, ")")
+  )
+
+  # Step (c): Determine the rejection region for a left-tailed test
+  z_critical <- qnorm(alpha)
+  rejection_region <- paste("Reject H0 if z <", round(z_critical, 4))
+
+  # Step (d): Calculate the test statistic
+  standard_error <- sqrt((p0 * (1 - p0)) / n)
+  z <- (sample_proportion - p0) / standard_error
+  test_statistic_details <- paste(
+    "Calculate z = (sample_proportion - p0) / SE:",
+    "sample_proportion =", round(sample_proportion, 4),
+    ", p0 =", p0,
+    ", SE =", round(standard_error, 4),
+    ", z =", round(z, 4)
+  )
+
+  # Step (e): Obtain the p-value for a left-tailed test
+  p_value <- pnorm(z)
+  p_value_details <- paste("One-tailed p-value for z =", round(z, 4), "=> p-value =", round(p_value, 4))
+
+  # Step (f): Decision and Conclusion
+  decision <- if (z < z_critical) "Reject H0" else "Do not reject H0"
+  conclusion <- if (z < z_critical) {
+    "There is significant evidence that the proportion is less than the hypothesized value."
+  } else {
+    "There is not enough evidence to conclude that the proportion is less than the hypothesized value."
+  }
+
+  # Return all details in the output
+  return(list(
+    sampling_distribution = paste("Sampling distribution: N(mean =", p0,
+                                  ", standard deviation =", round(standard_error, 4), ")"),
+    assumption_details = assumption_details,
+    hypotheses = hypotheses,
+    rejection_region = rejection_region,
+    test_statistic_details = test_statistic_details,
+    p_value_details = p_value_details,
+    decision = decision,
+    conclusion = conclusion
+  ))
+}
+
+
+#' @title Paired t-Test for Mean Difference
+#' @description Performs a paired t-test to determine if there is a significant difference between two paired samples.
+#' @param sample1 A numeric vector representing the first set of paired observations (e.g., campus bookstore prices).
+#' @param sample2 A numeric vector representing the second set of paired observations (e.g., Amazon prices).
+#' @param alpha The significance level for the test (default is 0.05).
+#' @return A list containing the test type, test statistic, p-value, confidence interval, decision, and conclusion, with all work shown.
+#' @details
+#' This function calculates the test statistic, p-value, and confidence interval for a paired t-test.
+#' It assumes that the data are approximately normally distributed.
+#' @examples
+#' campus_prices <- c(99.34, 51.53, 20.45, 97.22, 61.89, 58.17, 61.63, 44.63, 96.69, 48.88)
+#' amazon_prices <- c(113.94, 61.44, 31.59, 108.29, 78.44, 65.74, 63.49, 40.39, 117.99, 58.94)
+#' paired_t_test(sample1 = campus_prices, sample2 = amazon_prices, alpha = 0.05)
+#' @export
+paired_t_test <- function(sample1, sample2, alpha = 0.05) {
+  # Check that the two samples are paired and have the same length
+  if (length(sample1) != length(sample2)) {
+    stop("The two samples must be of the same length for a paired t-test.")
+  }
+
+  # Calculate the differences
+  differences <- sample1 - sample2
+
+  # Step (a): State the test type
+  test_type <- "Paired t-test to check if the mean difference is significantly different from zero"
+
+  # Step (b): Calculate the sample statistics
+  n <- length(differences)
+  mean_diff <- mean(differences)
+  sd_diff <- sd(differences)
+  standard_error <- sd_diff / sqrt(n)
+
+  # Step (c): Calculate the test statistic
+  t_stat <- mean_diff / standard_error
+  test_statistic_details <- paste(
+    "Calculate t = mean_diff / SE:",
+    "mean_diff =", round(mean_diff, 4),
+    ", SE =", round(standard_error, 4),
+    ", t =", round(t_stat, 4)
+  )
+
+  # Step (d): Obtain the p-value for a two-tailed test
+  p_value <- 2 * (1 - pt(abs(t_stat), df = n - 1))
+  p_value_details <- paste("Two-tailed p-value for t =", round(t_stat, 4), "=> p-value =", round(p_value, 4))
+
+  # Step (e): Determine the confidence interval for the mean difference
+  t_critical <- qt(1 - alpha / 2, df = n - 1)
+  margin_of_error <- t_critical * standard_error
+  ci_lower <- mean_diff - margin_of_error
+  ci_upper <- mean_diff + margin_of_error
+  confidence_interval <- paste("Confidence interval for the mean difference: (",
+                               round(ci_lower, 4), ", ", round(ci_upper, 4), ")")
+
+  # Step (f): Decision and Conclusion
+  decision <- if (p_value < alpha) "Reject H0" else "Do not reject H0"
+  conclusion <- if (p_value < alpha) {
+    "There is significant evidence of a difference in the mean of paired samples."
+  } else {
+    "There is not enough evidence to conclude a difference in the mean of paired samples."
+  }
+
+  # Return all details in the output
+  return(list(
+    test_type = test_type,
+    test_statistic_details = test_statistic_details,
+    p_value_details = p_value_details,
+    confidence_interval = confidence_interval,
+    decision = decision,
+    conclusion = conclusion
+  ))
+}
+
+
+#' @title One-Tailed Two-Sample t-Test for Difference in Means
+#' @description Performs a one-tailed t-test to determine if there is a significant difference in the means of two independent samples.
+#' @param n1 Sample size for the first sample.
+#' @param mean1 Sample mean for the first sample.
+#' @param sd1 Sample standard deviation for the first sample.
+#' @param n2 Sample size for the second sample.
+#' @param mean2 Sample mean for the second sample.
+#' @param sd2 Sample standard deviation for the second sample.
+#' @param alpha The significance level for the test (default is 0.05).
+#' @param direction A string indicating the direction of the test: "greater" if testing if sample 1 is greater than sample 2, or "less" if testing if sample 1 is less than sample 2.
+#' @return A list containing the test type, test statistic, p-value, confidence interval, decision, and conclusion, with all work shown.
+#' @details
+#' This function calculates the test statistic, p-value, and confidence interval for a one-tailed two-sample t-test. It assumes that the samples are independent, normally distributed, and have equal variances.
+#' @examples
+#' one_tailed_t_test(n1 = 15, mean1 = 540, sd1 = 21, n2 = 15, mean2 = 554, sd2 = 15, alpha = 0.05, direction = "less")
+#' @export
+one_tailed_t_test <- function(n1, mean1, sd1, n2, mean2, sd2, alpha = 0.05, direction = "greater") {
+  # Step (a): State the test type
+  test_type <- paste("One-tailed two-sample t-test for difference in means, testing if",
+                     ifelse(direction == "greater", "mean1 > mean2", "mean1 < mean2"))
+
+  # Step (b): Calculate pooled standard deviation
+  sp <- sqrt(((n1 - 1) * sd1^2 + (n2 - 1) * sd2^2) / (n1 + n2 - 2))
+
+  # Step (c): Calculate the test statistic
+  standard_error <- sp * sqrt(1 / n1 + 1 / n2)
+  t_stat <- (mean1 - mean2) / standard_error
+  test_statistic_details <- paste(
+    "Calculate t = (mean1 - mean2) / SE:",
+    "mean1 =", mean1,
+    ", mean2 =", mean2,
+    ", SE =", round(standard_error, 4),
+    ", t =", round(t_stat, 4)
+  )
+
+  # Step (d): Determine the critical t-value and rejection region for a one-tailed test
+  df <- n1 + n2 - 2
+  t_critical <- qt(1 - alpha, df)
+  rejection_region <- if (direction == "greater") {
+    paste("Reject H0 if t >", round(t_critical, 4))
+  } else {
+    paste("Reject H0 if t <", round(-t_critical, 4))
+  }
+
+  # Step (e): Obtain the p-value for the test
+  if (direction == "greater") {
+    p_value <- 1 - pt(t_stat, df)
+  } else {
+    p_value <- pt(t_stat, df)
+  }
+  p_value_details <- paste("One-tailed p-value for t =", round(t_stat, 4), "=> p-value =", round(p_value, 4))
+
+  # Step (f): Decision and Conclusion
+  decision <- if ((direction == "greater" && t_stat > t_critical) || (direction == "less" && t_stat < -t_critical)) "Reject H0" else "Do not reject H0"
+  conclusion <- if (decision == "Reject H0") {
+    "There is significant evidence supporting the hypothesis about the difference in means as specified by the direction of the test."
+  } else {
+    "There is not enough evidence to support the hypothesis about the difference in means as specified by the direction of the test."
+  }
+
+  # Step (g): Calculate the confidence interval for the difference in means
+  t_critical_ci <- qt(1 - alpha / 2, df)
+  margin_of_error <- t_critical_ci * standard_error
+  ci_lower <- (mean1 - mean2) - margin_of_error
+  ci_upper <- (mean1 - mean2) + margin_of_error
+  confidence_interval <- paste("90% Confidence interval for the difference in means: (",
+                               round(ci_lower, 4), ", ", round(ci_upper, 4), ")")
+
+  # Return all details in the output
+  return(list(
+    test_type = test_type,
+    test_statistic_details = test_statistic_details,
+    p_value_details = p_value_details,
+    rejection_region = rejection_region,
+    confidence_interval = confidence_interval,
+    decision = decision,
+    conclusion = conclusion
+  ))
+}
+
