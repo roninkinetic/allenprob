@@ -20,10 +20,10 @@ expected_value_y_detailed(a, b, cdf, lower_bound, upper_bound, cutoff_point)
 \item{cutoff_point}{Point where Y = 0 if X < cutoff_point (e.g., -1 for X < 0).}
 }
 \value{
-A list containing detailed step-by-step explanation of the calculations and results for E\link{Y}.
+A character vector containing a detailed, step-by-step explanation of the calculations and results for E\link{Y}.
 }
 \description{
-Computes the expected value E\link{Y} where Y is a linear transformation of X, with specific conditions on the range of X. Returns detailed step-by-step explanation of the results.
+Computes the expected value E\link{Y} where Y is a linear transformation of X, with specific conditions on the range of X. Returns detailed step-by-step explanation suitable for use in a free response answer.
 }
 \details{
 This function integrates over the specified range of X to compute E\link{Y} for a linear transformation of X,
@@ -32,9 +32,11 @@ conditioned on X being within a specified range.
 \examples{
 # Define the CDF of X: F(x) = (1/2)x + (1/2), for -1 <= x <= 1
 cdf_x <- function(x) {
-  if (x < -1) return(0)
-  if (x > 1) return(1)
-  return(0.5 * x + 0.5)
+  result <- numeric(length(x))
+  result[x < -1] <- 0
+  result[x > 1] <- 1
+  result[x >= -1 & x <= 1] <- 0.5 * x[x >= -1 & x <= 1] + 0.5
+  return(result)
 }
 expected_value_y_detailed(a = 8, b = 6, cdf = cdf_x, lower_bound = 0, upper_bound = 1, cutoff_point = 0)
 }
