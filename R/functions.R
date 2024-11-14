@@ -2887,3 +2887,60 @@ one_tailed_t_test <- function(n1, mean1, sd1, n2, mean2, sd2, alpha = 0.05, dire
   ))
 }
 
+#' @title Expected Value of a Transformed Random Variable with Detailed Explanation
+#' @description Computes the expected value E[Y] where Y is a linear transformation of X, with specific conditions on the range of X. Returns detailed step-by-step explanation of the results.
+#' @param a Coefficient of X in the linear transformation Y = a * X + b.
+#' @param b Constant term in the linear transformation Y = a * X + b.
+#' @param cdf Function defining the cumulative distribution function of X.
+#' @param lower_bound Lower bound of X for the transformation (e.g., 0 for X >= 0).
+#' @param upper_bound Upper bound of X for the transformation (e.g., 1 for X <= 1).
+#' @param cutoff_point Point where Y = 0 if X < cutoff_point (e.g., -1 for X < 0).
+#' @return A list containing detailed step-by-step explanation of the calculations and results for E[Y].
+#' @details
+#' This function integrates over the specified range of X to compute E[Y] for a linear transformation of X,
+#' conditioned on X being within a specified range.
+#' @examples
+#' # Define the CDF of X: F(x) = (1/2)x + (1/2), for -1 <= x <= 1
+#' cdf_x <- function(x) {
+#'   if (x < -1) return(0)
+#'   if (x > 1) return(1)
+#'   return(0.5 * x + 0.5)
+#' }
+#' expected_value_y_detailed(a = 8, b = 6, cdf = cdf_x, lower_bound = 0, upper_bound = 1, cutoff_point = 0)
+#' @export
+expected_value_y_detailed <- function(a, b, cdf, lower_bound, upper_bound, cutoff_point) {
+
+  # Step 1: Calculate the probability P(X >= cutoff_point)
+  p_x_positive <- 1 - cdf(cutoff_point)
+  step1 <- paste("Step 1: Calculate P(X >= cutoff_point): P(X >= ", cutoff_point, ") = 1 - F(", cutoff_point, ") = ", round(p_x_positive, 4))
+
+  # Step 2: Calculate the probability P(X < cutoff_point)
+  p_x_negative <- cdf(cutoff_point)
+  step2 <- paste("Step 2: Calculate P(X < cutoff_point): P(X < ", cutoff_point, ") = F(", cutoff_point, ") = ", round(p_x_negative, 4))
+
+  # Step 3: Define the integral to compute E[Y | X >= cutoff_point]
+  integrate_y_given_x_positive <- function() {
+    integrate(function(x) (a * x + b) * (cdf(x + 0.0001) - cdf(x - 0.0001)) / 0.0002,
+              lower = lower_bound, upper = upper_bound)$value
+  }
+
+  # Step 4: Compute E[Y | X >= cutoff_point]
+  e_y_positive <- integrate_y_given_x_positive()
+  step4 <- paste("Step 4: Calculate E[Y | X >= cutoff_point]:",
+                 "Integrate ((a * x + b) * f(x)) from", lower_bound, "to", upper_bound, "=", round(e_y_positive, 4))
+
+  # Step 5: Calculate E[Y] = E[Y | X >= cutoff_point] * P(X >= cutoff_point) + E[Y | X < cutoff_point] * P(X < cutoff_point)
+  # Since Y = 0 when X < cutoff_point, E[Y | X < cutoff_point] = 0
+  e_y <- e_y_positive * p_x_positive + 0 * p_x_negative
+  step5 <- paste("Step 5: Calculate E[Y]: E[Y] = E[Y | X >= cutoff_point] * P(X >= cutoff_point) + 0 * P(X < cutoff_point) =", round(e_y, 4))
+
+  # Return all steps and final result
+  return(list(
+    step1 = step1,
+    step2 = step2,
+    step3 = "Step 3: Define the integral for E[Y | X >= cutoff_point]",
+    step4 = step4,
+    step5 = step5,
+    expected_value_y = paste("Final Result: E[Y] =", round(e_y, 4))
+  ))
+}
